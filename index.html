@@ -1,116 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Callsign</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
-.glass{background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12)}
-.glow::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%, rgba(74,222,128,0.15), transparent 50%);pointer-events:none}
-</style>
-</head>
-<body class="text-white p-3 md:p-6 min-h-screen relative">
-<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(ellipse_at_bottom_right,_rgba(59,130,246,0.15),transparent_60%)]"></div>
-
-<div class="max-w-6xl mx-auto relative z-10 space-y-4">
-
-<div class="glass rounded-2xl p-4 flex justify-between items-center relative glow overflow-hidden">
-<div class="flex gap-3 items-center">
-<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-xl">🛡️</div>
-<div><h1 class="text-xl md:text-2xl font-extrabold">Mini Callsign</h1><p class="text-xs text-green-300/70">Security Dashboard • v2.4.1 PRO</p></div>
-</div>
-<div class="flex gap-2 items-center">
-<span id="overallBadge" class="hidden md:flex text-xs bg-white/10 border border-green-400/30 px-3 py-1 rounded-full">🛡️ All Systems Secure • SAFE</span>
-<span class="w-8 h-8 glass rounded-lg flex items-center justify-center text-xs">AD</span>
-</div>
-</div>
-
-<div class="glass rounded-2xl p-4 flex justify-between items-center">
-<div>
-<p class="text-xs bg-white/10 px-2 py-0.5 rounded-full inline-block mb-1">Overall Security Status</p>
-<h2 id="overallStatus" class="text-2xl md:text-3xl font-extrabold text-green-400 flex gap-2 items-center">SECURE 🛡️</h2>
-<p class="text-xs text-gray-400 mt-1">No threats detected • Last scan: 2 minutes ago • Monitoring active</p>
-</div>
-<div class="text-right">
-<p class="text-xs bg-white/10 px-2 py-0.5 rounded-full">Risk Score</p>
-<p id="riskScore" class="text-3xl font-bold text-green-300">12/100</p>
-<span id="riskLabel" class="text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">Low Risk</span>
-</div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-<div class="glass rounded-xl p-4 relative overflow-hidden glow">
-<p class="font-bold">🔒 VPN Detection</p>
-<span id="vpnBadge" class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="vpnText" class="text-xs text-green-300/80 mt-3">VPN/Proxy: Not Detected</p>
-<p class="text-xs text-gray-300 mt-1">Status: Clean • Confidence: 98%</p>
-<div class="w-full h-1 bg-white/10 rounded mt-3"><div class="h-1 bg-green-400 w-[85%] rounded"></div></div>
-</div>
-
-<div class="glass rounded-xl p-4 relative overflow-hidden glow">
-<p class="font-bold">📍 Fake GPS Detection</p>
-<span id="gpsBadge" class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="gpsText" class="text-xs text-green-300/80 mt-3">GPS Spoofing: Not Detected</p>
-<p id="gpsDetail" class="text-xs text-gray-300 mt-1">Location: Consistent • Anomaly Score: 0.02</p>
-<div class="w-full h-1 bg-white/10 rounded mt-3"><div id="gpsBar" class="h-1 bg-green-400 w-[75%] rounded"></div></div>
-</div>
-
-<div class="glass rounded-xl p-4">
-<p class="font-bold">📱 Device Info</p>
-<span class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="deviceText" class="text-xs text-green-300/80 mt-3">Device: Checking...</p>
-<p id="rootText" class="text-xs text-gray-300 mt-1">Root/Jailbreak: None • Integrity: Verified</p>
-<div class="w-full h-1 bg-white/10 rounded mt-3"><div class="h-1 bg-green-400 w-[90%] rounded"></div></div>
-</div>
-
-<div class="glass rounded-xl p-4 relative overflow-hidden">
-<p class="font-bold">⌨️ Typing Biometrics</p>
-<span class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="typingText" class="text-xs text-green-300/80 mt-3">Behavior: Normal Pattern</p>
-<p class="text-xs text-gray-300 mt-1">Keystroke Rhythm: Consistent • Anomaly: 3%</p>
-<input id="typeBox" placeholder="Type here to test..." class="mt-3 w-full bg-black/50 border border-white/10 rounded-lg p-2 text-xs">
-</div>
-
-<div class="glass rounded-xl p-4">
-<p class="font-bold">🖱️ Mouse Behavior</p>
-<span id="mouseBadge" class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="mouseText" class="text-xs text-green-300/80 mt-3">Movement: Human-like</p>
-<p class="text-xs text-gray-300 mt-1">Acceleration: Normal • Click Rate: 4.2/s</p>
-</div>
-
-<div class="glass rounded-xl p-4">
-<p class="font-bold">💻 Emulator Detection</p>
-<span id="emuBadge" class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
-<p id="emuText" class="text-xs text-green-300/80 mt-3">Emulator/Simulator: Not Detected</p>
-<p class="text-xs text-gray-300 mt-1">Hardware Check: Physical Device • Score: 0.01</p>
-<div class="w-full h-1 bg-white/10 rounded mt-3"><div class="h-1 bg-green-400 w-[95%] rounded"></div></div>
-</div>
-
-</div>
-
-<div class="glass rounded-xl p-5 max-w-2xl mx-auto flex flex-col md:flex-row justify-between gap-4">
-<div>
-<p class="font-bold text-lg">🌐 IP Risk Score</p>
-<p class="text-5xl font-extrabold text-green-300">18/<span class="text-2xl">100</span> <span class="text-xs bg-green-400 text-black px-2 py-1 rounded-full align-middle">LOW RISK</span></p>
-</div>
-<div class="space-y-2 text-xs">
-<p id="ipGeo">📍 Geolocation: US • California</p>
-<p id="ipASN">🗄️ ASN: Cloudflare Inc • Trusted</p>
-<p id="threatIntel">✅ Threat Intel: No Blacklist Match</p>
-<p id="ipText" class="text-gray-400 break-all"></p>
-<div class="w-full h-1 bg-white/10 rounded"><div class="h-1 bg-green-400 w-[18%] rounded"></div></div>
-<button onclick="checkGPS()" class="mt-2 bg-white text-black px-4 py-1 rounded-full text-xs font-bold">Check My GPS</button>
-</div>
-</div>
-
-<p class="text-center text-xs text-gray-500">Monitoring: Real-time • Updated just now • All checks compliant</p>
-
-</div>
-
 <script>
 let ipData = null;
 async function init(){
@@ -127,6 +14,8 @@ async function init(){
     document.getElementById('vpnBadge').className='mt-2 inline-block text-xs bg-yellow-400 text-black px-3 py-1 rounded-full font-bold';
     document.getElementById('vpnText').textContent='⚠️ TZ Mismatch: '+tz+' vs '+d.timezone;
   }
+  // AUTO CHECK GPS after 2 sec
+  setTimeout(checkGPS, 2000);
  }catch(e){}
  let ua=navigator.userAgent;
  document.getElementById('deviceText').textContent='Device: '+ua.slice(0,45)+'...';
@@ -138,17 +27,19 @@ function checkGPS(){
  let readings=[];
  document.getElementById('gpsText').textContent='⏳ Taking 3 readings...';
  document.getElementById('gpsDetail').textContent='Please wait 4 seconds...';
+ document.getElementById('gpsBadge').textContent='⏳ CHECKING...';
+ document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-blue-400 text-black px-3 py-1 rounded-full font-bold';
  
  function takeReading(){
   navigator.geolocation.getCurrentPosition(p=>{
    readings.push(p.coords);
    if(readings.length < 3){
     document.getElementById('gpsText').textContent=`⏳ Reading ${readings.length}/3...`;
-    setTimeout(takeReading, 1500);
+    setTimeout(takeReading, 1200);
    } else {
     analyze(readings);
    }
-  },()=>{document.getElementById('gpsText').textContent='❌ Permission Denied - Allow Location'; document.getElementById('gpsDetail').textContent='Enable GPS from browser';},{enableHighAccuracy:true, timeout:10000, maximumAge:0});
+  },()=>{document.getElementById('gpsText').textContent='❌ Permission Denied - Allow Location'; document.getElementById('gpsDetail').textContent='Chrome Settings > Location > Allow';},{enableHighAccuracy:true, timeout:10000, maximumAge:0});
  }
  takeReading();
 }
@@ -161,32 +52,32 @@ function analyze(reads){
  let lon=reads[0].longitude;
  let fakeReasons=[];
 
- if(alt===null) fakeReasons.push("No Altitude");
- if(speed===0 || speed===null) fakeReasons.push("Zero Speed");
- if(reads[0].latitude===reads[1].latitude && reads[1].latitude===reads[2].latitude) fakeReasons.push("100% Static Location");
- if(acc < 4) fakeReasons.push("Too Perfect "+acc.toFixed(1)+"m");
- if(acc > 800) fakeReasons.push("Low Accuracy "+Math.round(acc)+"m");
+ if(alt===null) fakeReasons.push("No Altitude (Fake App)");
+ if(speed===null) fakeReasons.push("No Speed");
+ if(reads[0].latitude===reads[1].latitude && reads[1].latitude===reads[2].latitude) fakeReasons.push("100% Static");
+ if(acc < 3) fakeReasons.push("Too Perfect "+acc.toFixed(1)+"m");
+ if(acc > 600) fakeReasons.push("Bad Accuracy "+Math.round(acc)+"m");
 
- // IP vs GPS comparison - MAIN FAKE DETECTION
  if(ipData && ipData.latitude){
    let ipLat=ipData.latitude, ipLon=ipData.longitude;
    let dist=getDistance(lat, lon, ipLat, ipLon);
-   if(dist > 500){
+   // VPN ON hai to distance check ko thoda kam strict karo, warna VPN wale ko bhi fake bolega
+   // Agar Fake GPS Riyadh me aur IP America me = 12000km = Pakka fake GPS ya VPN me se ek fake hai
+   // Isiliye threshold 200km rakha hai
+   if(dist > 200){
      fakeReasons.push(`IP-GPS Mismatch ${Math.round(dist)}km`);
-     document.getElementById('threatIntel').textContent=`⚠️ IP is ${ipData.city} but GPS is ${lat.toFixed(2)},${lon.toFixed(2)}`;
    }
+   document.getElementById('ipGeo').textContent=`📍 IP:${ipData.city} vs GPS:${lat.toFixed(2)},${lon.toFixed(2)} = ${Math.round(dist)}km away`;
  }
 
- let isFake = fakeReasons.length >= 2;
+ let isFake = fakeReasons.length >= 1; // 1 reason bhi mila to FAKE
 
  if(isFake){
   document.getElementById('gpsBadge').textContent='🚨 FAKE GPS DETECTED';
-  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold';
+  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold animate-pulse';
   document.getElementById('gpsText').textContent='🚨 FAKE: '+fakeReasons.join(" | ");
-  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Acc:${Math.round(acc)}m`;
+  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Acc:${Math.round(acc)}m Alt:${alt||'null'}`;
   document.getElementById('gpsBar').className='h-1 bg-red-500 w-[95%] rounded';
-  
-  // Overall status update
   document.getElementById('overallStatus').textContent='THREAT DETECTED 🚨';
   document.getElementById('overallStatus').className='text-2xl md:text-3xl font-extrabold text-red-400 flex gap-2 items-center';
   document.getElementById('riskScore').textContent='78/100';
@@ -202,7 +93,6 @@ function analyze(reads){
   document.getElementById('gpsBar').className='h-1 bg-green-400 w-[75%] rounded';
  }
 }
-
 function getDistance(lat1, lon1, lat2, lon2){
  let R=6371;
  let dLat=(lat2-lat1)*Math.PI/180;
@@ -210,16 +100,7 @@ function getDistance(lat1, lon1, lat2, lon2){
  let a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-
-window.addEventListener('mousemove',()=>{
- document.getElementById('mouseText').textContent='Movement: Human-like - Detected';
-});
+window.addEventListener('mousemove',()=>{document.getElementById('mouseText').textContent='Movement: Human-like - Detected';});
 let last=0;
-document.getElementById('typeBox').addEventListener('keydown',()=>{
- let now=Date.now();
- if(last) document.getElementById('typingText').textContent='Behavior: Typing... '+(now-last)+'ms';
- last=now;
-});
+document.getElementById('typeBox').addEventListener('keydown',()=>{let now=Date.now(); if(last) document.getElementById('typingText').textContent='Behavior: Typing... '+(now-last)+'ms'; last=now;});
 </script>
-</body>
-</html>
