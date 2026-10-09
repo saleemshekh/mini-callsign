@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Callsign - Saleem Bhai</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0a0a0f] text-white p-4">
+<div class="max-w-4xl mx-auto">
+<h1 class="text-3xl font-bold text-center">🛡️ Mini Callsign</h1>
+<p class="text-center text-gray-400 mb-6">Built for Saleem Bhai - 7 Security Checks</p>
+
+<div class="grid md:grid-cols-2 gap-4">
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">1. VPN Detection</h3><p id="vpn" class="text-sm text-gray-400">Checking...</p></div>
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">2. Fake GPS</h3><p id="gps" class="text-sm">Waiting...</p><button onclick="checkGPS()" class="mt-2 bg-white text-black px-3 py-1 rounded-full text-xs">Check Location</button></div>
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">3. Device Info</h3><p id="device" class="text-xs"></p></div>
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">4. Typing Biometrics</h3><input id="typeBox" class="w-full bg-black p-2 rounded mt-2" placeholder="Type here..."><p id="typing" class="text-xs mt-2"></p></div>
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">5. Mouse</h3><p id="mouse">Move finger...</p></div>
+<div class="bg-white/5 p-4 rounded-xl"><h3 class="font-bold">6. Emulator</h3><p id="emu">Checking...</p></div>
+<div class="bg-white/5 p-4 rounded-xl md:col-span-2"><h3 class="font-bold">7. IP + Risk Score</h3><p id="ip">Fetching...</p><p id="verdict" class="font-bold mt-3 text-xl">Analyzing...</p></div>
+</div>
+</div>
+
+<script>
+async function checkVPN(){
+ let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+ try{let r=await fetch('https://ipapi.co/json/');let d=await r.json();
+ document.getElementById('ip').innerHTML='IP: '+d.ip+' - '+d.city+'<br>TZ: '+tz+' vs IP TZ: '+d.timezone;
+ document.getElementById('vpn').innerHTML=tz!==d.timezone?'⚠️ Possible VPN':'✅ No VPN - '+tz;
+ }catch(e){document.getElementById('vpn').textContent='Check failed';}
+}
+checkVPN();
+function checkGPS(){
+ navigator.geolocation.getCurrentPosition(p=>{
+  let acc=p.coords.accuracy;
+  document.getElementById('gps').innerHTML=acc>1000?'⚠️ Fake GPS - '+acc+'m':'✅ Real GPS - '+Math.round(acc)+'m';
+ });
+}
+document.getElementById('device').innerHTML=navigator.userAgent.slice(0,70)+'...<br>Screen:'+screen.width+'x'+screen.height;
+let last=0,s=[];
+document.getElementById('typeBox').addEventListener('keydown',()=>{
+ let now=Date.now();if(last){s.push(now-last);}last=now;
+ if(s.length>2){let avg=s.reduce((a,b)=>a+b)/s.length;document.getElementById('typing').textContent='Avg: '+Math.round(avg)+'ms';}
+});
+window.addEventListener('touchmove',()=>{document.getElementById('mouse').textContent='✅ Human touch';});
+document.getElementById('emu').textContent=navigator.webdriver?'⚠️ Bot':'✅ Real Device';
+document.getElementById('verdict').textContent='✅ SAFE - Demo';
+</script>
+</body>
+</html>
