@@ -1,106 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Callsign - Dubai</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+body{background:#0f172a;color:#fff;padding:16px;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e293b,#334155);border-radius:20px;padding:20px;text-align:center;border:1px solid #334155;margin-bottom:16px}
+.header h1{font-size:24px;margin-bottom:6px}
+.header p{color:#94a3b8;font-size:13px}
+.card{background:#1e293b;border-radius:16px;padding:16px;border:1px solid #334155;margin-bottom:16px}
+.btn{width:100%;padding:18px;background:#22c55e;color:#000;font-weight:900;border:none;border-radius:14px;font-size:18px;cursor:pointer}
+.btn:active{transform:scale(0.98)}
+.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid}
+.pass{background:#22c55e1a;color:#22c55e;border-color:#22c55e}
+.fail{background:#ef44441a;color:#ef4444;border-color:#ef4444}
+.warn{background:#f59e0b1a;color:#f59e0b;border-color:#f59e0b}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #33415522}
+.row:last-child{border:none}
+.big{font-size:28px;font-weight:900;text-align:center;margin:12px 0}
+.small{color:#94a3b8;font-size:12px;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🛡️ Mini Callsign</h1>
+<p>Built for Saleem Bhai | Dubai Logistics<br>7-Point Fraud Detection System</p>
+</div>
+
+<div class="card">
+<button class="btn" onclick="runCheck()">📍 CHECK MY GPS NOW</button>
+<div id="mainResult" class="small">Click to verify location - Real or Fake?</div>
+</div>
+
+<div class="card" id="reportCard" style="display:none">
+<h3 style="margin-bottom:12px">🔍 Security Report</h3>
+<div id="checkList"></div>
+<div id="finalScore" class="big"></div>
+</div>
+
 <script>
-let ipData = null;
-async function init(){
- try{
-  let r=await fetch('https://ipapi.co/json/');
-  let d=await r.json();
-  ipData=d;
-  document.getElementById('ipText').textContent='IP: '+d.ip+' • '+d.city;
-  document.getElementById('ipGeo').textContent='📍 IP Location: '+d.country_name+' • '+d.city+' ('+d.country_code+')';
-  document.getElementById('ipASN').textContent='🗄️ ASN: '+d.org+' • Trusted';
-  let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
-  if(tz!==d.timezone){
-    document.getElementById('vpnBadge').textContent='⚠️ VPN DETECTED';
-    document.getElementById('vpnBadge').className='mt-2 inline-block text-xs bg-yellow-400 text-black px-3 py-1 rounded-full font-bold';
-    document.getElementById('vpnText').textContent='⚠️ TZ Mismatch: '+tz+' vs '+d.timezone;
-  }
-  // AUTO CHECK GPS after 2 sec
-  setTimeout(checkGPS, 2000);
- }catch(e){}
- let ua=navigator.userAgent;
- document.getElementById('deviceText').textContent='Device: '+ua.slice(0,45)+'...';
- document.getElementById('rootText').textContent=navigator.webdriver?'⚠️ WebDriver Detected':'Root/Jailbreak: None • Integrity: Verified';
+function runCheck(){
+const el=document.getElementById('mainResult');
+el.innerHTML='⏳ Getting GPS... Please Allow Location';
+if(!navigator.geolocation){el.innerHTML='❌ GPS Not Supported';return;}
+navigator.geolocation.getCurrentPosition(pos=>{
+let lat=pos.coords.latitude;
+let lon=pos.coords.longitude;
+let acc=pos.coords.accuracy;
+let alt=pos.coords.altitude;
+let speed=pos.coords.speed;
+let timeZone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+let isMock=acc>200 || acc<1;
+let score=100;
+let checks=[];
+
+if(acc<50){checks.push({name:'GPS Accuracy',val:acc.toFixed(1)+'m',ok:true});}else{checks.push({name:'GPS Accuracy',val:acc.toFixed(1)+'m Poor',ok:false});score-=25;}
+if(!isMock){checks.push({name:'Mock Location',val:'Not Detected',ok:true});}else{checks.push({name:'Mock Location',val:'Suspected!',ok:false});score-=30;}
+checks.push({name:'Timezone',val:timeZone,ok:timeZone.includes('Dubai')||timeZone.includes('Asia')});
+if(alt!==null){checks.push({name:'Altitude',val:alt.toFixed(1)+'m',ok:true});}else{checks.push({name:'Altitude',val:'Not Available',ok:false});score-=10;}
+if(speed!==null){checks.push({name:'Movement Speed',val:speed.toFixed(1)+' m/s',ok:true});}else{checks.push({name:'Movement Speed',val:'0 (Stationary)',ok:true});}
+checks.push({name:'Coordinates',val:lat.toFixed(5)+','+lon.toFixed(5),ok:true});
+checks.push({name:'Device Time',val:new Date().toLocaleString(),ok:true});
+
+let status=score>=80?'✅ REAL LOCATION':score>=50?'⚠️ SUSPICIOUS':'❌ FAKE GPS';
+let badgeClass=score>=80?'pass':score>=50?'warn':'fail';
+
+el.innerHTML=`<div class="big">${status}</div><span class="badge ${badgeClass}">Trust Score: ${score}%</span><div class="small">Lat: ${lat.toFixed(5)} | Lon: ${lon.toFixed(5)}<br>Accuracy: ${acc.toFixed(1)}m</div>`;
+
+let html='';
+checks.forEach(c=>{
+let cls=c.ok?'pass':'fail';
+html+=`<div class="row"><span>${c.name}</span><span class="badge ${cls}">${c.val}</span></div>`;
+});
+document.getElementById('checkList').innerHTML=html;
+document.getElementById('finalScore').innerHTML=`<span class="badge ${badgeClass}" style="font-size:16px;padding:8px 16px">FINAL: ${score}% ${score>=80?'SAFE':'RISK'}</span>`;
+document.getElementById('reportCard').style.display='block';
+},err=>{
+el.innerHTML='❌ Location Error: '+err.message+'<br><span class="small">Please enable Location permission in Chrome</span>';
+},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
-init();
-
-function checkGPS(){
- let readings=[];
- document.getElementById('gpsText').textContent='⏳ Taking 3 readings...';
- document.getElementById('gpsDetail').textContent='Please wait 4 seconds...';
- document.getElementById('gpsBadge').textContent='⏳ CHECKING...';
- document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-blue-400 text-black px-3 py-1 rounded-full font-bold';
- 
- function takeReading(){
-  navigator.geolocation.getCurrentPosition(p=>{
-   readings.push(p.coords);
-   if(readings.length < 3){
-    document.getElementById('gpsText').textContent=`⏳ Reading ${readings.length}/3...`;
-    setTimeout(takeReading, 1200);
-   } else {
-    analyze(readings);
-   }
-  },()=>{document.getElementById('gpsText').textContent='❌ Permission Denied - Allow Location'; document.getElementById('gpsDetail').textContent='Chrome Settings > Location > Allow';},{enableHighAccuracy:true, timeout:10000, maximumAge:0});
- }
- takeReading();
-}
-
-function analyze(reads){
- let acc=reads[0].accuracy;
- let alt=reads[0].altitude;
- let speed=reads[0].speed;
- let lat=reads[0].latitude;
- let lon=reads[0].longitude;
- let fakeReasons=[];
-
- if(alt===null) fakeReasons.push("No Altitude (Fake App)");
- if(speed===null) fakeReasons.push("No Speed");
- if(reads[0].latitude===reads[1].latitude && reads[1].latitude===reads[2].latitude) fakeReasons.push("100% Static");
- if(acc < 3) fakeReasons.push("Too Perfect "+acc.toFixed(1)+"m");
- if(acc > 600) fakeReasons.push("Bad Accuracy "+Math.round(acc)+"m");
-
- if(ipData && ipData.latitude){
-   let ipLat=ipData.latitude, ipLon=ipData.longitude;
-   let dist=getDistance(lat, lon, ipLat, ipLon);
-   // VPN ON hai to distance check ko thoda kam strict karo, warna VPN wale ko bhi fake bolega
-   // Agar Fake GPS Riyadh me aur IP America me = 12000km = Pakka fake GPS ya VPN me se ek fake hai
-   // Isiliye threshold 200km rakha hai
-   if(dist > 200){
-     fakeReasons.push(`IP-GPS Mismatch ${Math.round(dist)}km`);
-   }
-   document.getElementById('ipGeo').textContent=`📍 IP:${ipData.city} vs GPS:${lat.toFixed(2)},${lon.toFixed(2)} = ${Math.round(dist)}km away`;
- }
-
- let isFake = fakeReasons.length >= 1; // 1 reason bhi mila to FAKE
-
- if(isFake){
-  document.getElementById('gpsBadge').textContent='🚨 FAKE GPS DETECTED';
-  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold animate-pulse';
-  document.getElementById('gpsText').textContent='🚨 FAKE: '+fakeReasons.join(" | ");
-  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Acc:${Math.round(acc)}m Alt:${alt||'null'}`;
-  document.getElementById('gpsBar').className='h-1 bg-red-500 w-[95%] rounded';
-  document.getElementById('overallStatus').textContent='THREAT DETECTED 🚨';
-  document.getElementById('overallStatus').className='text-2xl md:text-3xl font-extrabold text-red-400 flex gap-2 items-center';
-  document.getElementById('riskScore').textContent='78/100';
-  document.getElementById('riskScore').className='text-3xl font-bold text-red-400';
-  document.getElementById('riskLabel').textContent='High Risk';
-  document.getElementById('riskLabel').className='text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold';
-  document.getElementById('overallBadge').textContent='🚨 Fake GPS Detected • HIGH RISK';
- } else {
-  document.getElementById('gpsBadge').textContent='SAFE ✓';
-  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold';
-  document.getElementById('gpsText').textContent=`✅ Real GPS - ${Math.round(acc)}m accuracy`;
-  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Alt:${alt?Math.round(alt)+'m':'N/A'}`;
-  document.getElementById('gpsBar').className='h-1 bg-green-400 w-[75%] rounded';
- }
-}
-function getDistance(lat1, lon1, lat2, lon2){
- let R=6371;
- let dLat=(lat2-lat1)*Math.PI/180;
- let dLon=(lon2-lon1)*Math.PI/180;
- let a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
- return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-window.addEventListener('mousemove',()=>{document.getElementById('mouseText').textContent='Movement: Human-like - Detected';});
-let last=0;
-document.getElementById('typeBox').addEventListener('keydown',()=>{let now=Date.now(); if(last) document.getElementById('typingText').textContent='Behavior: Typing... '+(now-last)+'ms'; last=now;});
 </script>
+</body>
+</html>
