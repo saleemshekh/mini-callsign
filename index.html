@@ -2,84 +2,89 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Callsign - Dubai</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mini Callsign - PRO</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
-body{background:#0f172a;color:#fff;padding:16px;min-height:100vh}
-.header{background:linear-gradient(135deg,#1e293b,#334155);border-radius:20px;padding:20px;text-align:center;border:1px solid #334155;margin-bottom:16px}
-.header h1{font-size:24px;margin-bottom:6px}
-.header p{color:#94a3b8;font-size:13px}
-.card{background:#1e293b;border-radius:16px;padding:16px;border:1px solid #334155;margin-bottom:16px}
-.btn{width:100%;padding:18px;background:#22c55e;color:#000;font-weight:900;border:none;border-radius:14px;font-size:18px;cursor:pointer}
-.btn:active{transform:scale(0.98)}
-.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:#0f172a;color:#fff;padding:14px}
+.header{background:#1e293b;border-radius:18px;padding:18px;text-align:center;border:1px solid #334155;margin-bottom:14px}
+.card{background:#1e293b;border-radius:16px;padding:14px;border:1px solid #334155;margin-bottom:14px}
+.btn{width:100%;padding:16px;background:#22c55e;color:#000;font-weight:900;border:none;border-radius:12px;font-size:17px}
+.badge{display:inline-block;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid}
 .pass{background:#22c55e1a;color:#22c55e;border-color:#22c55e}
 .fail{background:#ef44441a;color:#ef4444;border-color:#ef4444}
 .warn{background:#f59e0b1a;color:#f59e0b;border-color:#f59e0b}
-.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #33415522}
-.row:last-child{border:none}
-.big{font-size:28px;font-weight:900;text-align:center;margin:12px 0}
-.small{color:#94a3b8;font-size:12px;text-align:center;margin-top:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff12}
 </style>
 </head>
 <body>
 <div class="header">
-<h1>🛡️ Mini Callsign</h1>
-<p>Built for Saleem Bhai | Dubai Logistics<br>7-Point Fraud Detection System</p>
+<h1>🛡️ Mini Callsign PRO</h1>
+<p style="color:#94a3b8;font-size:12px">Built for Saleem Bhai | 8-Point Fraud Detection<br>VPN + Mock + IP + GPS</p>
 </div>
 
 <div class="card">
-<button class="btn" onclick="runCheck()">📍 CHECK MY GPS NOW</button>
-<div id="mainResult" class="small">Click to verify location - Real or Fake?</div>
+<button class="btn" onclick="runAll()">📍 CHECK MY GPS + VPN NOW</button>
+<div id="main" style="text-align:center;margin-top:12px;color:#94a3b8;font-size:13px">Click to start full security scan</div>
 </div>
 
-<div class="card" id="reportCard" style="display:none">
-<h3 style="margin-bottom:12px">🔍 Security Report</h3>
-<div id="checkList"></div>
-<div id="finalScore" class="big"></div>
+<div class="card" id="report" style="display:none">
+<h3>🔍 Full Security Report</h3>
+<div id="list" style="margin-top:10px"></div>
+<div id="final" style="text-align:center;margin-top:14px"></div>
 </div>
 
 <script>
-function runCheck(){
-const el=document.getElementById('mainResult');
-el.innerHTML='⏳ Getting GPS... Please Allow Location';
-if(!navigator.geolocation){el.innerHTML='❌ GPS Not Supported';return;}
+async function runAll(){
+let main=document.getElementById('main');
+main.innerHTML='⏳ Scanning GPS + IP + VPN...';
+let ipData={};
+try{
+let res=await fetch('https://ipapi.co/json/');
+ipData=await res.json();
+}catch(e){ipData={city:'Unknown',country_name:'Unknown',org:'Unknown'}}
+
 navigator.geolocation.getCurrentPosition(pos=>{
+let acc=pos.coords.accuracy;
 let lat=pos.coords.latitude;
 let lon=pos.coords.longitude;
-let acc=pos.coords.accuracy;
-let alt=pos.coords.altitude;
-let speed=pos.coords.speed;
-let timeZone=Intl.DateTimeFormat().resolvedOptions().timeZone;
-let isMock=acc>200 || acc<1;
+let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
 let score=100;
 let checks=[];
 
-if(acc<50){checks.push({name:'GPS Accuracy',val:acc.toFixed(1)+'m',ok:true});}else{checks.push({name:'GPS Accuracy',val:acc.toFixed(1)+'m Poor',ok:false});score-=25;}
-if(!isMock){checks.push({name:'Mock Location',val:'Not Detected',ok:true});}else{checks.push({name:'Mock Location',val:'Suspected!',ok:false});score-=30;}
-checks.push({name:'Timezone',val:timeZone,ok:timeZone.includes('Dubai')||timeZone.includes('Asia')});
-if(alt!==null){checks.push({name:'Altitude',val:alt.toFixed(1)+'m',ok:true});}else{checks.push({name:'Altitude',val:'Not Available',ok:false});score-=10;}
-if(speed!==null){checks.push({name:'Movement Speed',val:speed.toFixed(1)+' m/s',ok:true});}else{checks.push({name:'Movement Speed',val:'0 (Stationary)',ok:true});}
-checks.push({name:'Coordinates',val:lat.toFixed(5)+','+lon.toFixed(5),ok:true});
-checks.push({name:'Device Time',val:new Date().toLocaleString(),ok:true});
+//1 GPS Acc
+if(acc<50 && acc>0){checks.push(['GPS Accuracy',acc.toFixed(1)+'m',true]);}else{checks.push(['GPS Accuracy',acc.toFixed(1)+'m Fake?',false]);score-=20;}
+//2 Mock
+if(acc===0 || acc>500){checks.push(['Mock Location','Suspected!',false]);score-=30;}else{checks.push(['Mock Location','Not Detected',true]);}
+//3 Timezone
+checks.push(['Timezone',tz,tz.includes('Asia')]);
+//4 Altitude
+checks.push(['Altitude',(pos.coords.altitude||0).toFixed(1)+'m',true]);
+//5 IP Location
+checks.push(['IP City',ipData.city+', '+ipData.country_name,true]);
+//6 ISP / VPN
+let isVPN=(ipData.org||'').toLowerCase().includes('vpn') || (ipData.org||'').toLowerCase().includes('host') || (ipData.org||'').toLowerCase().includes('cloud');
+if(isVPN){checks.push(['VPN / Proxy',ipData.org+' - Suspected!',false]);score-=25;}else{checks.push(['VPN / Proxy',ipData.org||'No VPN',true]);}
+//7 IP vs GPS mismatch
+let ipCountry=ipData.country||'SA';
+let gpsInSaudi=lat>16 && lat<33 && lon>34 && lon<56;
+let mismatch=(ipCountry!=='SA' && gpsInSaudi) || (ipCountry==='SA' && !gpsInSaudi && (lat>10));
+if(mismatch){checks.push(['IP vs GPS Match','Mismatch! '+ipCountry+' vs GPS',false]);score-=20;}else{checks.push(['IP vs GPS Match','Matched '+ipCountry,true]);}
+//8 Speed
+checks.push(['Speed',(pos.coords.speed||0).toFixed(1)+' m/s',true]);
 
-let status=score>=80?'✅ REAL LOCATION':score>=50?'⚠️ SUSPICIOUS':'❌ FAKE GPS';
-let badgeClass=score>=80?'pass':score>=50?'warn':'fail';
-
-el.innerHTML=`<div class="big">${status}</div><span class="badge ${badgeClass}">Trust Score: ${score}%</span><div class="small">Lat: ${lat.toFixed(5)} | Lon: ${lon.toFixed(5)}<br>Accuracy: ${acc.toFixed(1)}m</div>`;
+let status=score>=80?'✅ REAL LOCATION':score>=50?'⚠️ SUSPICIOUS':'❌ FAKE GPS / VPN';
+let cls=score>=80?'pass':score>=50?'warn':'fail';
+main.innerHTML=`<div style="font-size:22px;font-weight:900;margin:8px 0">${status}</div><span class="badge ${cls}">Trust: ${score}%</span><br><span style="font-size:11px">GPS: ${lat.toFixed(4)},${lon.toFixed(4)} | IP: ${ipData.ip||''}<br>Acc: ${acc}m | ISP: ${ipData.org||''}</span>`;
 
 let html='';
 checks.forEach(c=>{
-let cls=c.ok?'pass':'fail';
-html+=`<div class="row"><span>${c.name}</span><span class="badge ${cls}">${c.val}</span></div>`;
+html+=`<div class="row"><span>${c[0]}</span><span class="badge ${c[2]?'pass':'fail'}">${c[1]}</span></div>`;
 });
-document.getElementById('checkList').innerHTML=html;
-document.getElementById('finalScore').innerHTML=`<span class="badge ${badgeClass}" style="font-size:16px;padding:8px 16px">FINAL: ${score}% ${score>=80?'SAFE':'RISK'}</span>`;
-document.getElementById('reportCard').style.display='block';
-},err=>{
-el.innerHTML='❌ Location Error: '+err.message+'<br><span class="small">Please enable Location permission in Chrome</span>';
-},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+document.getElementById('list').innerHTML=html;
+document.getElementById('final').innerHTML=`<span class="badge ${cls}" style="font-size:15px;padding:8px 14px">FINAL: ${score}% ${score>=80?'SAFE':'RISK'}</span>`;
+document.getElementById('report').style.display='block';
+},e=>{main.innerHTML='❌ Enable Location: '+e.message},{enableHighAccuracy:true,timeout:15000});
 }
 </script>
 </body>
