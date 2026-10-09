@@ -17,33 +17,30 @@ body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
 
 <div class="max-w-6xl mx-auto relative z-10 space-y-4">
 
-<!-- Header -->
 <div class="glass rounded-2xl p-4 flex justify-between items-center relative glow overflow-hidden">
 <div class="flex gap-3 items-center">
 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-xl">🛡️</div>
-<div><h1 class="text-xl md:text-2xl font-extrabold">Mini Callsign</h1><p class="text-xs text-green-300/70">Security Dashboard • v2.4.1</p></div>
+<div><h1 class="text-xl md:text-2xl font-extrabold">Mini Callsign</h1><p class="text-xs text-green-300/70">Security Dashboard • v2.4.1 PRO</p></div>
 </div>
 <div class="flex gap-2 items-center">
-<span class="hidden md:flex text-xs bg-white/10 border border-green-400/30 px-3 py-1 rounded-full">🛡️ All Systems Secure • SAFE</span>
+<span id="overallBadge" class="hidden md:flex text-xs bg-white/10 border border-green-400/30 px-3 py-1 rounded-full">🛡️ All Systems Secure • SAFE</span>
 <span class="w-8 h-8 glass rounded-lg flex items-center justify-center text-xs">AD</span>
 </div>
 </div>
 
-<!-- Overall Status -->
 <div class="glass rounded-2xl p-4 flex justify-between items-center">
 <div>
 <p class="text-xs bg-white/10 px-2 py-0.5 rounded-full inline-block mb-1">Overall Security Status</p>
-<h2 class="text-2xl md:text-3xl font-extrabold text-green-400 flex gap-2 items-center">SECURE 🛡️</h2>
+<h2 id="overallStatus" class="text-2xl md:text-3xl font-extrabold text-green-400 flex gap-2 items-center">SECURE 🛡️</h2>
 <p class="text-xs text-gray-400 mt-1">No threats detected • Last scan: 2 minutes ago • Monitoring active</p>
 </div>
 <div class="text-right">
 <p class="text-xs bg-white/10 px-2 py-0.5 rounded-full">Risk Score</p>
-<p class="text-3xl font-bold text-green-300">12/100</p>
-<span class="text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">Low Risk</span>
+<p id="riskScore" class="text-3xl font-bold text-green-300">12/100</p>
+<span id="riskLabel" class="text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">Low Risk</span>
 </div>
 </div>
 
-<!-- Grid 6 cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
 <div class="glass rounded-xl p-4 relative overflow-hidden glow">
@@ -58,8 +55,8 @@ body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
 <p class="font-bold">📍 Fake GPS Detection</p>
 <span id="gpsBadge" class="mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold">SAFE ✓</span>
 <p id="gpsText" class="text-xs text-green-300/80 mt-3">GPS Spoofing: Not Detected</p>
-<p class="text-xs text-gray-300 mt-1">Location: Consistent • Anomaly Score: 0.02</p>
-<div class="w-full h-1 bg-white/10 rounded mt-3"><div class="h-1 bg-green-400 w-[75%] rounded"></div></div>
+<p id="gpsDetail" class="text-xs text-gray-300 mt-1">Location: Consistent • Anomaly Score: 0.02</p>
+<div class="w-full h-1 bg-white/10 rounded mt-3"><div id="gpsBar" class="h-1 bg-green-400 w-[75%] rounded"></div></div>
 </div>
 
 <div class="glass rounded-xl p-4">
@@ -95,7 +92,6 @@ body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
 
 </div>
 
-<!-- IP Risk -->
 <div class="glass rounded-xl p-5 max-w-2xl mx-auto flex flex-col md:flex-row justify-between gap-4">
 <div>
 <p class="font-bold text-lg">🌐 IP Risk Score</p>
@@ -103,8 +99,8 @@ body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
 </div>
 <div class="space-y-2 text-xs">
 <p id="ipGeo">📍 Geolocation: US • California</p>
-<p>🗄️ ASN: Cloudflare Inc • Trusted</p>
-<p>✅ Threat Intel: No Blacklist Match</p>
+<p id="ipASN">🗄️ ASN: Cloudflare Inc • Trusted</p>
+<p id="threatIntel">✅ Threat Intel: No Blacklist Match</p>
 <p id="ipText" class="text-gray-400 break-all"></p>
 <div class="w-full h-1 bg-white/10 rounded"><div class="h-1 bg-green-400 w-[18%] rounded"></div></div>
 <button onclick="checkGPS()" class="mt-2 bg-white text-black px-4 py-1 rounded-full text-xs font-bold">Check My GPS</button>
@@ -116,17 +112,20 @@ body{font-family:'Inter',sans-serif;background:#070a14;overflow-x:hidden}
 </div>
 
 <script>
+let ipData = null;
 async function init(){
  try{
   let r=await fetch('https://ipapi.co/json/');
   let d=await r.json();
+  ipData=d;
   document.getElementById('ipText').textContent='IP: '+d.ip+' • '+d.city;
-  document.getElementById('ipGeo').textContent='📍 Geolocation: '+d.country_name+' • '+d.city;
+  document.getElementById('ipGeo').textContent='📍 IP Location: '+d.country_name+' • '+d.city+' ('+d.country_code+')';
+  document.getElementById('ipASN').textContent='🗄️ ASN: '+d.org+' • Trusted';
   let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
   if(tz!==d.timezone){
     document.getElementById('vpnBadge').textContent='⚠️ VPN DETECTED';
     document.getElementById('vpnBadge').className='mt-2 inline-block text-xs bg-yellow-400 text-black px-3 py-1 rounded-full font-bold';
-    document.getElementById('vpnText').textContent='⚠️ Possible VPN - TZ mismatch';
+    document.getElementById('vpnText').textContent='⚠️ TZ Mismatch: '+tz+' vs '+d.timezone;
   }
  }catch(e){}
  let ua=navigator.userAgent;
@@ -134,18 +133,84 @@ async function init(){
  document.getElementById('rootText').textContent=navigator.webdriver?'⚠️ WebDriver Detected':'Root/Jailbreak: None • Integrity: Verified';
 }
 init();
+
 function checkGPS(){
- navigator.geolocation.getCurrentPosition(p=>{
-  let acc=p.coords.accuracy;
-  if(acc>1000){
-    document.getElementById('gpsBadge').textContent='⚠️ FAKE GPS';
-    document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-red-400 text-black px-3 py-1 rounded-full font-bold';
-    document.getElementById('gpsText').textContent='⚠️ Spoofing Suspected - '+Math.round(acc)+'m';
-  } else {
-    document.getElementById('gpsText').textContent='✅ Real GPS - '+Math.round(acc)+'m accuracy';
-  }
- },()=>{document.getElementById('gpsText').textContent='Permission Denied';});
+ let readings=[];
+ document.getElementById('gpsText').textContent='⏳ Taking 3 readings...';
+ document.getElementById('gpsDetail').textContent='Please wait 4 seconds...';
+ 
+ function takeReading(){
+  navigator.geolocation.getCurrentPosition(p=>{
+   readings.push(p.coords);
+   if(readings.length < 3){
+    document.getElementById('gpsText').textContent=`⏳ Reading ${readings.length}/3...`;
+    setTimeout(takeReading, 1500);
+   } else {
+    analyze(readings);
+   }
+  },()=>{document.getElementById('gpsText').textContent='❌ Permission Denied - Allow Location'; document.getElementById('gpsDetail').textContent='Enable GPS from browser';},{enableHighAccuracy:true, timeout:10000, maximumAge:0});
+ }
+ takeReading();
 }
+
+function analyze(reads){
+ let acc=reads[0].accuracy;
+ let alt=reads[0].altitude;
+ let speed=reads[0].speed;
+ let lat=reads[0].latitude;
+ let lon=reads[0].longitude;
+ let fakeReasons=[];
+
+ if(alt===null) fakeReasons.push("No Altitude");
+ if(speed===0 || speed===null) fakeReasons.push("Zero Speed");
+ if(reads[0].latitude===reads[1].latitude && reads[1].latitude===reads[2].latitude) fakeReasons.push("100% Static Location");
+ if(acc < 4) fakeReasons.push("Too Perfect "+acc.toFixed(1)+"m");
+ if(acc > 800) fakeReasons.push("Low Accuracy "+Math.round(acc)+"m");
+
+ // IP vs GPS comparison - MAIN FAKE DETECTION
+ if(ipData && ipData.latitude){
+   let ipLat=ipData.latitude, ipLon=ipData.longitude;
+   let dist=getDistance(lat, lon, ipLat, ipLon);
+   if(dist > 500){
+     fakeReasons.push(`IP-GPS Mismatch ${Math.round(dist)}km`);
+     document.getElementById('threatIntel').textContent=`⚠️ IP is ${ipData.city} but GPS is ${lat.toFixed(2)},${lon.toFixed(2)}`;
+   }
+ }
+
+ let isFake = fakeReasons.length >= 2;
+
+ if(isFake){
+  document.getElementById('gpsBadge').textContent='🚨 FAKE GPS DETECTED';
+  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold';
+  document.getElementById('gpsText').textContent='🚨 FAKE: '+fakeReasons.join(" | ");
+  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Acc:${Math.round(acc)}m`;
+  document.getElementById('gpsBar').className='h-1 bg-red-500 w-[95%] rounded';
+  
+  // Overall status update
+  document.getElementById('overallStatus').textContent='THREAT DETECTED 🚨';
+  document.getElementById('overallStatus').className='text-2xl md:text-3xl font-extrabold text-red-400 flex gap-2 items-center';
+  document.getElementById('riskScore').textContent='78/100';
+  document.getElementById('riskScore').className='text-3xl font-bold text-red-400';
+  document.getElementById('riskLabel').textContent='High Risk';
+  document.getElementById('riskLabel').className='text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold';
+  document.getElementById('overallBadge').textContent='🚨 Fake GPS Detected • HIGH RISK';
+ } else {
+  document.getElementById('gpsBadge').textContent='SAFE ✓';
+  document.getElementById('gpsBadge').className='mt-2 inline-block text-xs bg-green-400 text-black px-3 py-1 rounded-full font-bold';
+  document.getElementById('gpsText').textContent=`✅ Real GPS - ${Math.round(acc)}m accuracy`;
+  document.getElementById('gpsDetail').textContent=`GPS: ${lat.toFixed(4)},${lon.toFixed(4)} Alt:${alt?Math.round(alt)+'m':'N/A'}`;
+  document.getElementById('gpsBar').className='h-1 bg-green-400 w-[75%] rounded';
+ }
+}
+
+function getDistance(lat1, lon1, lat2, lon2){
+ let R=6371;
+ let dLat=(lat2-lat1)*Math.PI/180;
+ let dLon=(lon2-lon1)*Math.PI/180;
+ let a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+ return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
 window.addEventListener('mousemove',()=>{
  document.getElementById('mouseText').textContent='Movement: Human-like - Detected';
 });
