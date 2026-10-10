@@ -1,68 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini Callsign - PRO MAX</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#0f172a;color:#fff;padding:14px}
-.header{background:#1e293b;border-radius:18px;padding:18px;text-align:center;border:1px solid #334155;margin-bottom:14px}
-.card{background:#1e293b;border-radius:16px;padding:14px;border:1px solid #334155;margin-bottom:14px}
-.btn{width:100%;padding:16px;background:#22c55e;color:#000;font-weight:900;border:none;border-radius:12px;font-size:17px}
-.badge{display:inline-block;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid}
-.pass{background:#22c55e1a;color:#22c55e;border-color:#22c55e}
-.fail{background:#ef44441a;color:#ef4444;border-color:#ef4444}
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff12}
-</style>
+<title>Mini Callsign</title>
 </head>
-<body>
-<div class="header">
-<h1>🛡️ Mini Callsign PRO MAX</h1>
-<p style="color:#94a3b8;font-size:12px">For Saleem Bhai | Dubai Logistics<br>VPN + Mock + IP + GPS = 8 Checks</p>
-</div>
-<div class="card">
-<button class="btn" onclick="runAll()">📍 CHECK MY GPS + VPN NOW</button>
-<div id="main" style="text-align:center;margin-top:12px;color:#94a3b8;font-size:13px">Click to start scan</div>
-</div>
-<div class="card" id="report" style="display:none">
-<h3>🔍 Full Security Report</h3>
-<div id="list" style="margin-top:10px"></div>
-<div id="final" style="text-align:center;margin-top:14px"></div>
-</div>
+<body style="background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center">
+<h1>🛡️ Mini Callsign PRO</h1>
+<p>For Saleem Bhai</p>
+<button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK MY GPS + VPN NOW</button>
+<div id="out" style="margin-top:20px;background:#1e293b;padding:15px;border-radius:12px">Click button to start</div>
 <script>
-async function runAll(){
-let main=document.getElementById('main');
-main.innerHTML='⏳ Scanning...';
-let ipData={};
+function check(){
+let out=document.getElementById('out');
+out.innerHTML='Getting location...';
+navigator.geolocation.getCurrentPosition(async p=>{
+let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
+let ipText='Fetching IP...';
 try{
 let r=await fetch('https://ipapi.co/json/');
-ipData=await r.json();
-}catch(e){ipData={city:'Unknown',country_name:'Unknown',country:'US',org:'Unknown',ip:'Unknown'}}
-navigator.geolocation.getCurrentPosition(p=>{
-let acc=p.coords.accuracy,lat=p.coords.latitude,lon=p.coords.longitude,tz=Intl.DateTimeFormat().resolvedOptions().timeZone,score=100,checks=[],org=(ipData.org||'').toLowerCase();
-if(acc<50&&acc>0){checks.push(['GPS Accuracy',acc.toFixed(1)+'m',true])}else{checks.push(['GPS Accuracy',acc.toFixed(1)+'m Fake?',false]);score-=20}
-if(acc===0||acc>500){checks.push(['Mock Location','Suspected!',false]);score-=30}else{checks.push(['Mock Location','Not Detected',true])}
-checks.push(['Timezone',tz,tz.includes('Asia/Riyadh')||tz.includes('Asia/Dubai')]);
-checks.push(['Altitude',(p.coords.altitude||0).toFixed(1)+'m',true]);
-checks.push(['IP City',(ipData.city||'?')+', '+(ipData.country_name||'?'),true]);
-let keys=['vpn','m247','datacamp','host','cloud','digitalocean','linode','ovh','hetzner','amazon','google','choopa'];
-let isVPN=keys.some(k=>org.includes(k));
-if(isVPN){checks.push(['VPN / Proxy',ipData.org+' - VPN!',false]);score-=35}else{checks.push(['VPN / Proxy',ipData.org||'No VPN',true])}
-let ipC=ipData.country||'US';
-let gpsSaudi=lat>16&&lat<33&&lon>34&&lon<56;
-let mismatch=(gpsSaudi&&ipC!=='SA')||(!gpsSaudi&&ipC==='SA')||(gpsSaudi&&ipC==='US');
-if(mismatch){checks.push(['IP vs GPS Match','Mismatch! '+ipC+' vs SA GPS',false]);score-=30}else{checks.push(['IP vs GPS Match','Matched '+ipC,true])}
-checks.push(['Speed',(p.coords.speed||0).toFixed(1)+' m/s',true]);
-let status=score>=80?'✅ REAL LOCATION':score>=50?'⚠️ SUSPICIOUS':'❌ FAKE / VPN DETECTED';
-let cls=score>=80?'pass':'fail';
-main.innerHTML=`<div style="font-size:20px;font-weight:900;margin:8px 0">${status}</div><span class="badge ${cls}">Trust: ${score}%</span><br><span style="font-size:11px">GPS: ${lat.toFixed(4)},${lon.toFixed(4)} | IP: ${ipData.ip||''}<br>Acc: ${acc.toFixed(1)}m | ISP: ${ipData.org||''}</span>`;
-let h='';
-checks.forEach(c=>{h+=`<div class="row"><span>${c[0]}</span><span class="badge ${c[2]?'pass':'fail'}">${c[1]}</span></div>`});
-document.getElementById('list').innerHTML=h;
-document.getElementById('final').innerHTML=`<span class="badge ${cls}" style="font-size:15px;padding:8px 14px">FINAL: ${score}% ${score>=80?'SAFE':'RISK'}</span>`;
-document.getElementById('report').style.display='block';
-},e=>{main.innerHTML='❌ Enable Location: '+e.message},{enableHighAccuracy:true,timeout:15000});
+let j=await r.json();
+ipText=j.city+', '+j.country_name+' | ISP: '+j.org+' | IP: '+j.ip;
+let isVPN=(j.org||'').toLowerCase().includes('m247')||j.country!=='SA';
+let msg=isVPN?'❌ VPN DETECTED / MISMATCH':'✅ NO VPN';
+ipText+='<br><b>'+msg+'</b>';
+}catch(e){ipText='IP check failed (adblock?)';}
+out.innerHTML='GPS: '+lat.toFixed(5)+','+lon.toFixed(5)+'<br>Acc: '+acc.toFixed(1)+'m<br>'+ipText+'<br><br><b>Trust: '+(acc<50?'80% REAL':'30% FAKE')+'</b>';
+},e=>{out.innerHTML='Error: '+e.message+' - Location ON karo'});
 }
 </script>
 </body>
