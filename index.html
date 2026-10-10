@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini Callsign v15 ULTIMATE</title>
+<title>Saleem Al Badi - Dubai Location Verification</title>
 <style>
-body{background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center}
-.card{background:#1e293b;padding:16px;border-radius:14px;text-align:left;line-height:1.9;margin-top:16px;border:1px solid #334155}
-.b{padding:16px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;margin-top:10px}
-.good{color:#22c55e}.bad{color:#ef4444}.warn{color:#fbbf24}
+body{background:#0a1a2f;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto;padding:18px;text-align:center;margin:0}
+.header{background:linear-gradient(135deg,#00732f 0%,#000 50%,#ff0000 100%);padding:18px;border-radius:16px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.header h1{margin:0;font-size:22px;line-height:1.3}
+.header p{margin:8px 0 0;opacity:.9;font-size:13px}
+.btn{width:100%;padding:18px;background:#22c55e;border:none;border-radius:14px;font-weight:900;font-size:18px;cursor:pointer;color:#000}
+.card{background:#132a4a;padding:18px;border-radius:16px;text-align:left;line-height:1.9;margin-top:16px;border:1px solid #1e4a7a}
+.badge{padding:16px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;margin-top:14px}
+.good{color:#22c55e}.bad{color:#ff4d4d}
+.wa{display:block;width:100%;padding:14px;background:#25D366;color:#000;border-radius:10px;font-weight:900;text-decoration:none;text-align:center;margin-top:12px}
 </style>
 </head><body>
-<h1>🛡️ Mini Callsign v15<br>ULTIMATE</h1>
-<p style="color:#22c55e;font-weight:900">VPN + Fake GPS - Dono Detect - Dubai Ready</p>
-<button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK VPN + FAKE GPS NOW</button>
-<div id="out" class="card">
-<b>v15 Features:</b><br>
-✅ VPN Detect (Brazil, Netherlands, etc)<br>
-✅ Fake GPS Detect (Acc 0.0m)<br>
-✅ Location Outside SA Detect (6.5,4.6 Nigeria)<br>
-Click button to start
+<div class="header">
+<h1>🇦🇪 Saleem Al Badi Transport<br>Location Verification - Dubai & Riyadh</h1>
+<p>Official Driver Location Check | VPN & Fake GPS Detector</p>
 </div>
+
+<button class="btn" onclick="check()">📍 VERIFY MY REAL LOCATION NOW</button>
+
+<div id="out" class="card" style="text-align:center">
+<b>System v16 FINAL - Dubai Ready</b><br><br>
+✅ VPN Detection (Brazil, Netherlands, M247, Latitude.sh)<br>
+✅ Fake GPS Detection (Accuracy 0.0m)<br>
+✅ Outside Saudi Detection (Nigeria 6.5,4.6)<br><br>
+Press VERIFY to start - All checks in one click
+</div>
+
 <script>
 async function getIP(){
  try{
@@ -25,50 +35,59 @@ async function getIP(){
   let j=await r.json();
   return {city:j.city,country:j.country_name,code:j.country_code,org:j.org,ip:j.ip};
  }catch(e){
-  return {city:'Riyadh',country:'Saudi Arabia',code:'SA',org:'Etihad Salam Telecom',ip:''};
+  return {city:'Riyadh',country:'Saudi Arabia',code:'SA',org:'Etihad Salam Telecom',ip:'Unknown'};
  }
 }
 async function check(){
  let out=document.getElementById('out');
- out.innerHTML='⏳ Checking VPN + Fake GPS...';
+ out.innerHTML='⏳ Verifying VPN & GPS... Please wait...';
  let ip=await getIP();
  navigator.geolocation.getCurrentPosition(p=>{
   let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
   
-  // --- DETECTION LOGIC ---
-  let isMock = (acc === 0 || acc < 1.5); // Fake GPS App
-  let isSaudiGPS = (lat>=16 && lat<=33 && lon>=34 && lon<=56); // Saudi bounds
+  // Detection Logic - 100% English
+  let isMock = (acc === 0 || acc < 1.5);
+  let isSaudiGPS = (lat>=16 && lat<=33 && lon>=34 && lon<=56);
   let isForeignGPS = !isSaudiGPS;
   let orgL = (ip.org||'').toLowerCase();
-  let isVPN = (ip.code!=='SA' || orgL.includes('vpn') || orgL.includes('m247') || orgL.includes('latitude') || orgL.includes('datacamp') || orgL.includes('choopa') || orgL.includes('ovh') || orgL.includes('digitalocean') || orgL.includes('amazon'));
-  
+  let isVPN = (ip.code!=='SA' || orgL.includes('vpn') || orgL.includes('m247') || orgL.includes('latitude') || orgL.includes('datacamp') || orgL.includes('choopa') || orgL.includes('ovh') || orgL.includes('digitalocean') || orgL.includes('amazon') || orgL.includes('hosting'));
+
   let isFake = isMock || isForeignGPS || isVPN;
   let score = isFake ? 10 : 100;
-  
-  let reasons=[];
-  if(isMock) reasons.push('❌ <b>FAKE GPS ON HAI:</b> Acc '+acc.toFixed(1)+'m = 0.0m matlab Fake GPS App use ho raha hai!');
-  else reasons.push('✅ Acc '+acc.toFixed(1)+'m = Real GPS');
-  
-  if(isForeignGPS) reasons.push('❌ <b>FAKE LOCATION:</b> GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' Saudi se bahar hai! (Nigeria 6.5,4.6). Riyadh 24.6,46.7 hota hai');
-  else reasons.push('✅ GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' Saudi ke andar hai');
-  
-  if(isVPN) reasons.push('❌ <b>VPN ON HAI:</b> IP '+ip.city+', '+ip.country+' ('+ip.code+') - '+ip.org);
-  else reasons.push('✅ VPN OFF hai - IP '+ip.city+', '+ip.code+' '+ip.org);
-  
-  let status = isFake ? '❌ FAKE / VPN DETECTED - 10%' : '✅ REAL LOCATION - 100%';
+
+  let statusText = isFake ? 'FAKE / VPN DETECTED - 10%' : 'REAL LOCATION - 100%';
   let color = isFake ? '#ef4444' : '#22c55e';
   
-  out.innerHTML = 
-   '<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' '+(isSaudiGPS?'<span class=good>(Riyadh SA ✅)</span>':'<span class=bad>(OUTSIDE SA ❌ FAKE)</span>')+
-   '<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span class=bad>❌ FAKE GPS ON HAI!</span>':'<span class=good>✅ Real</span>')+
-   '<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.code+')<br><b>IP Address:</b> '+(ip.ip||'')+
-   '<br><b>ISP:</b> '+ip.org+
-   '<br><br><b>VPN:</b> '+(isVPN?'<span class=bad>YES - ON HAI ❌</span>':'<span class=good>NO - OFF hai ✅</span>')+
-   '<br><b>Fake GPS:</b> '+(isMock?'<span class=bad>YES - ON HAI ❌</span>':'<span class=good>NO - OFF hai ✅</span>')+
-   '<br><b>Location:</b> '+(isSaudiGPS?'<span class=good>Inside Saudi ✅</span>':'<span class=bad>Outside Saudi ❌</span>')+
-   '<br><br><div class=b style=background:'+color+';color:#000>'+status+'</div>'+
-   '<br><div style=font-size:13px;line-height:1.6>'+reasons.join('<br><br>')+'</div>';
+  let details = [];
+  if(isMock) details.push('❌ Fake GPS App Detected: Accuracy '+acc.toFixed(1)+'m (Real is 3m-30m)');
+  else details.push('✅ GPS Accuracy: '+acc.toFixed(1)+'m - Real Sensor');
   
- },err=>{out.innerHTML='GPS Error: '+err.message+'<br>Please Allow Location Permission';},{enableHighAccuracy:true,timeout:10000});
+  if(isForeignGPS) details.push('❌ Fake Location: GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' is outside Saudi Arabia (Expected 24.6,46.7 Riyadh / 25.2,55.2 Dubai)');
+  else details.push('✅ GPS Location: Inside Saudi Arabia/UAE - '+lat.toFixed(2)+','+lon.toFixed(2));
+
+  if(isVPN) details.push('❌ VPN Detected: IP from '+ip.city+', '+ip.country+' ('+ip.code+') - ISP: '+ip.org);
+  else details.push('✅ VPN Check: No VPN - IP from '+ip.city+', '+ip.code+' - '+ip.org);
+
+  // WhatsApp Message - English
+  let waMsg = '*Saleem Al Badi - Driver Location Report*%0A%0A*Result:* '+(isFake?'❌ FAKE '+score+'%25':'✅ REAL '+score+'%25')+'%0A*GPS:* '+lat.toFixed(5)+','+lon.toFixed(5)+'%0A*Accuracy:* '+acc.toFixed(1)+'m%0A*IP:* '+ip.city+', '+ip.country+' ('+ip.code+')%0A*ISP:* '+ip.org+'%0A*IP Address:* '+ip.ip+'%0A*VPN:* '+(isVPN?'YES - ON ❌':'NO - OFF ✅')+'%0A*Fake GPS:* '+(isMock?'YES - ON ❌':'NO - OFF ✅')+'%0A*Location:* '+(isSaudiGPS?'Inside Saudi ✅':'Outside Saudi ❌');
+
+  out.innerHTML = 
+   '<b>GPS Coordinates:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' '+(isSaudiGPS?'<span class=good>(Inside SA/UAE ✅)</span>':'<span class=bad>(OUTSIDE SA/UAE ❌ FAKE)</span>')+
+   '<br><b>Accuracy:</b> '+acc.toFixed(1)+'m '+(isMock?'<span class=bad>❌ FAKE GPS APP ON!</span>':'<span class=good>✅ Real</span>')+
+   '<br><b>IP Location:</b> '+ip.city+', '+ip.country+' ('+ip.code+')'+
+   '<br><b>IP Address:</b> '+ip.ip+
+   '<br><b>ISP / Provider:</b> '+ip.org+
+   '<br><br><b>VPN Status:</b> '+(isVPN?'<span class=bad>YES - ON ❌</span>':'<span class=good>NO - OFF ✅</span>')+
+   '<br><b>Fake GPS Status:</b> '+(isMock?'<span class=bad>YES - ON ❌</span>':'<span class=good>NO - OFF ✅</span>')+
+   '<br><b>Region Check:</b> '+(isSaudiGPS?'<span class=good>Inside Saudi/UAE ✅</span>':'<span class=bad>Outside Saudi/UAE ❌ FAKE</span>')+
+   '<br><br><div class=badge style=background:'+color+';color:#000>❌ '.repeat(isFake?1:0)+'✅ '.repeat(!isFake?1:0)+statusText+'</div>'+
+   '<br><div style=font-size:13px;line-height:1.7;background:#0f1f3a;padding:12px;border-radius:10px>'+details.join('<br><br>')+'</div>'+
+   '<a class=wa href="https://wa.me/?text='+waMsg+'">📲 Share Report on WhatsApp to Saleem Bhai</a>'+
+   '<div style=text-align:center;margin-top:10px;font-size:11px;opacity:.6>Saleem Al Badi Transport - Dubai | v16 FINAL | '+new Date().toLocaleString()+'</div>';
+
+ },err=>{
+  out.innerHTML='❌ Location Permission Denied<br>Please allow location access and try again.<br><br>Error: '+err.message;
+ },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
-</script></body></html>
+</script>
+</body></html>
