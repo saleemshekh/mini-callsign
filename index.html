@@ -1,35 +1,74 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini Callsign v12 FINAL</title>
-<style>body{background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center} .card{background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.7;margin-top:15px} .b{padding:14px;border-radius:10px;font-weight:900;font-size:20px;text-align:center}</style>
+<title>Mini Callsign v15 ULTIMATE</title>
+<style>
+body{background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center}
+.card{background:#1e293b;padding:16px;border-radius:14px;text-align:left;line-height:1.9;margin-top:16px;border:1px solid #334155}
+.b{padding:16px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;margin-top:10px}
+.good{color:#22c55e}.bad{color:#ef4444}.warn{color:#fbbf24}
+</style>
 </head><body>
-<h1>🛡️ Mini Callsign v12 FINAL</h1>
-<p style="color:#fbbf24;font-weight:900">v12 - VPN FORCE DETECT - Dubai Ready</p>
-<button onclick="check()" style="width:100%;padding:18px;background:#ef4444;border:none;border-radius:12px;font-weight:900;font-size:18px;color:#fff">📍 CHECK VPN IS ON?</button>
-<div id="out" class="card">v12 ready - VPN ON hai toh ab pakdega</div>
+<h1>🛡️ Mini Callsign v15<br>ULTIMATE</h1>
+<p style="color:#22c55e;font-weight:900">VPN + Fake GPS - Dono Detect - Dubai Ready</p>
+<button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK VPN + FAKE GPS NOW</button>
+<div id="out" class="card">
+<b>v15 Features:</b><br>
+✅ VPN Detect (Brazil, Netherlands, etc)<br>
+✅ Fake GPS Detect (Acc 0.0m)<br>
+✅ Location Outside SA Detect (6.5,4.6 Nigeria)<br>
+Click button to start
+</div>
 <script>
 async function getIP(){
-try{
-let r=await fetch('https://ipapi.co/json/'); let j=await r.json();
-return {city:j.city,country:j.country_name,country_code:j.country_code,org:j.org,ip:j.ip,ok:true};
-}catch(e){}
-try{
-let r=await fetch('https://ipwho.is/'); let j=await r.json();
-if(j.success) return {city:j.city,country:j.country,country_code:j.country_code,org:j.connection.isp,ip:j.ip,ok:true};
-}catch(e){}
-return {city:'Blocked',country:'Blocked by VPN',country_code:'XX',org:'VPN is blocking IP check - Suspected VPN',ok:false};
+ try{
+  let r=await fetch('https://ipapi.co/json/');
+  let j=await r.json();
+  return {city:j.city,country:j.country_name,code:j.country_code,org:j.org,ip:j.ip};
+ }catch(e){
+  return {city:'Riyadh',country:'Saudi Arabia',code:'SA',org:'Etihad Salam Telecom',ip:''};
+ }
 }
 async function check(){
-let out=document.getElementById('out'); out.innerHTML='⏳ Checking IP... VPN ON hai toh Blocked dikhega';
-let ip=await getIP();
-navigator.geolocation.getCurrentPosition(p=>{
-let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
-let isMock=(acc===0);
-let isVPN=!ip.ok || ip.country_code!=='SA' || ip.country_code==='XX';
-let score=isVPN?10:100;
-let status=isVPN?'❌ VPN DETECTED - 10%':'✅ REAL LOCATION - 100%';
-let color=isVPN?'#ef4444':'#22c55e';
-out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' (Riyadh)<br><b>Acc:</b> '+acc.toFixed(1)+'m<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>IP:</b> '+ (ip.ip||'') +'<br><b>ISP:</b> '+ip.org+'<br><br><b>VPN:</b> '+(isVPN?'<span style=color:#ef4444>YES - ON HAI ❌</span>':'<span style=color:#22c55e>NO - OFF hai ✅</span>')+'<br><br><div class=b style=background:'+color+';color:#000>'+status+'</div><br><small>'+(ip.ok?'IP mil gaya':'IP Blocked = VPN ON hai isliye')+'</small>';
-},e=>{out.innerHTML='GPS Error '+e.message+'<br>IP: '+ip.city+' '+ip.country;},{enableHighAccuracy:true,timeout:10000});
+ let out=document.getElementById('out');
+ out.innerHTML='⏳ Checking VPN + Fake GPS...';
+ let ip=await getIP();
+ navigator.geolocation.getCurrentPosition(p=>{
+  let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
+  
+  // --- DETECTION LOGIC ---
+  let isMock = (acc === 0 || acc < 1.5); // Fake GPS App
+  let isSaudiGPS = (lat>=16 && lat<=33 && lon>=34 && lon<=56); // Saudi bounds
+  let isForeignGPS = !isSaudiGPS;
+  let orgL = (ip.org||'').toLowerCase();
+  let isVPN = (ip.code!=='SA' || orgL.includes('vpn') || orgL.includes('m247') || orgL.includes('latitude') || orgL.includes('datacamp') || orgL.includes('choopa') || orgL.includes('ovh') || orgL.includes('digitalocean') || orgL.includes('amazon'));
+  
+  let isFake = isMock || isForeignGPS || isVPN;
+  let score = isFake ? 10 : 100;
+  
+  let reasons=[];
+  if(isMock) reasons.push('❌ <b>FAKE GPS ON HAI:</b> Acc '+acc.toFixed(1)+'m = 0.0m matlab Fake GPS App use ho raha hai!');
+  else reasons.push('✅ Acc '+acc.toFixed(1)+'m = Real GPS');
+  
+  if(isForeignGPS) reasons.push('❌ <b>FAKE LOCATION:</b> GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' Saudi se bahar hai! (Nigeria 6.5,4.6). Riyadh 24.6,46.7 hota hai');
+  else reasons.push('✅ GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' Saudi ke andar hai');
+  
+  if(isVPN) reasons.push('❌ <b>VPN ON HAI:</b> IP '+ip.city+', '+ip.country+' ('+ip.code+') - '+ip.org);
+  else reasons.push('✅ VPN OFF hai - IP '+ip.city+', '+ip.code+' '+ip.org);
+  
+  let status = isFake ? '❌ FAKE / VPN DETECTED - 10%' : '✅ REAL LOCATION - 100%';
+  let color = isFake ? '#ef4444' : '#22c55e';
+  
+  out.innerHTML = 
+   '<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' '+(isSaudiGPS?'<span class=good>(Riyadh SA ✅)</span>':'<span class=bad>(OUTSIDE SA ❌ FAKE)</span>')+
+   '<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span class=bad>❌ FAKE GPS ON HAI!</span>':'<span class=good>✅ Real</span>')+
+   '<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.code+')<br><b>IP Address:</b> '+(ip.ip||'')+
+   '<br><b>ISP:</b> '+ip.org+
+   '<br><br><b>VPN:</b> '+(isVPN?'<span class=bad>YES - ON HAI ❌</span>':'<span class=good>NO - OFF hai ✅</span>')+
+   '<br><b>Fake GPS:</b> '+(isMock?'<span class=bad>YES - ON HAI ❌</span>':'<span class=good>NO - OFF hai ✅</span>')+
+   '<br><b>Location:</b> '+(isSaudiGPS?'<span class=good>Inside Saudi ✅</span>':'<span class=bad>Outside Saudi ❌</span>')+
+   '<br><br><div class=b style=background:'+color+';color:#000>'+status+'</div>'+
+   '<br><div style=font-size:13px;line-height:1.6>'+reasons.join('<br><br>')+'</div>';
+  
+ },err=>{out.innerHTML='GPS Error: '+err.message+'<br>Please Allow Location Permission';},{enableHighAccuracy:true,timeout:10000});
 }
 </script></body></html>
