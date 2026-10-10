@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>v24 Admin Dashboard - Saleem Shekh</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{background:#040a18;color:#fff;font-family:system-ui;margin:0;padding:8px}
+.h{background:linear-gradient(90deg,#00ff88,#00aaff);color:#000;padding:14px;border-radius:12px;font-weight:900;text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:8px}
+.stat{background:#0f1f3a;border:1px solid #1e3a5a;padding:10px;border-radius:10px;text-align:center}
+.stat b{font-size:22px;display:block}
+#map{height:320px;border-radius:12px;margin-top:8px;border:2px solid #00ff88}
+.c{background:#0f1f3a;border:1px solid #1e3a5a;padding:10px;border-radius:10px;margin-top:8px;font-size:11px}
+.btn{padding:10px 14px;border:none;border-radius:8px;font-weight:900;cursor:pointer;margin:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{background:#1e3a5a;padding:8px;text-align:left;position:sticky;top:0}
+.tbl td{padding:7px;border-bottom:1px solid #1e3a5a}
+.fakeRow{background:#3a0a0a}.realRow{background:#0a2a0a}
+</style>
+</head><body>
+<div class="h">🇦🇪 v24 ADMIN DASHBOARD - Saleem Shekh<br><span style="font-size:11px;font-weight:600">Live Driver Tracking | Risk 0-1000 | Fake GPS + VPN Detection</span></div>
+
+<div class="stats">
+<div class="stat"><b id="total">0</b>Total</div>
+<div class="stat" style="border-color:#22c55e"><b id="realC" style="color:#22c55e">0</b>✅ REAL</div>
+<div class="stat" style="border-color:#ef4444"><b id="fakeC" style="color:#ef4444">0</b>❌ FAKE</div>
+<div class="stat"><b id="avgR">0</b>Avg Risk</div>
+</div>
+
+<div id="map"></div>
+
+<div class="c">
+<button class="btn" style="background:#00ff88;color:#000" onclick="loadData()">🔄 Refresh</button>
+<button class="btn" style="background:#ef4444;color:#fff" onclick="filterFake()">❌ Fake Only</button>
+<button class="btn" style="background:#22c55e;color:#000" onclick="filterReal()">✅ Real Only</button>
+<button class="btn" style="background:#00aaff;color:#fff" onclick="showAll()">📋 All</button>
+<button class="btn" style="background:#333;color:#fff" onclick="clearData()">🗑 Clear</button>
+<button class="btn" style="background:#25D366;color:#000" onclick="shareSummary()">📲 WhatsApp Summary</button>
+<span id="lastUpd" style="font-size:10px;opacity:.6;margin-left:6px"></span>
+</div>
+
+<div class="c" style="max-height:400px;overflow:auto">
+<table class="tbl" id="tbl">
+<thead><tr><th>Time</th><th>Name</th><th>GPS</th><th>Acc</th><th>IP City</th><th>Risk</th><th>Status</th><th>Map</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+<div class="c" id="detail">Select a driver to see details on map</div>
+
+<script>
+var map=L.map('map').setView([24.7136,46.6753],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+var markers=[];
+var allData=[];
+
+function loadData(){
+ var raw=localStorage.getItem('v24_drivers')||'[]';
+ try{ allData=JSON.parse(raw); }catch(e){ allData=[]; }
+ // Also check URL params for new report (from driver app)
+ var p=new URLSearchParams(location.search);
+ if(p.has('gps')){
+  var entry={
+   time:new Date().toLocaleString('en-GB',{hour12:false}),
+   name:p.get('name')||'Unknown',
+   gps:p.get('gps')||'',
+   lat:parseFloat(p.get('lat')||0),
+   lon:parseFloat(p.get('lon')||0),
+   acc:p.get('acc')||'0',
+   ipCity:p.get('ip')||'',
+   risk:parseInt(p.get('risk')||0),
+   status:(p.get('status')||'FAKE').toUpperCase(),
+   fakeReason:p.get('reason')||''
+  };
+  allData.unshift(entry);
+  localStorage.setItem('v24_drivers', JSON.stringify(allData.slice(0,200)));
+  history.replaceState({},'',location.pathname);
+ }
+ render(allData);
+}
+
+function render(data){
+ var tbody=document.getElementById('tbody');
+ tbody.innerHTML='';
+ markers.forEach(m=>map.removeLayer(m)); markers=[];
+ var real=0,fake=0,sum=0;
+ data.forEach((d,i)=>{
+  if(d.status.includes('REAL')) real++; else fake++;
+  sum+=d.risk||0;
+  var tr=document.createElement('tr');
+  tr.className=d.status.includes('FAKE')?'fakeRow':'realRow';
+  tr.innerHTML='<td>'+d.time+'</td><td><b>'+d.name+'</b></td><td>'+(d.gps||d.lat.toFixed(4)+','+d.lon.toFixed(4))+'</td><td>'+d.acc+'m</td><td>'+d.ipCity+'</td><td style="font-weight:900;color:'+(d.risk>500?'#ef4444':d.risk>100?'#facc15':'#22c55e')+'">'+d.risk+'</td><td><b>'+d.status+'</b></td><td><button class="btn" style="padding:4px 8px;background:#00ff88;color:#000" onclick="focusDriver('+i+')">📍</button></td>';
+  tbody.appendChild(tr);
+  var color=d.status.includes('FAKE')?'red':'green';
+  var mk=L.circleMarker([d.lat,d.lon],{radius:8,color:color,fillColor:color,fillOpacity:.8}).addTo(map).bindPopup('<b>'+d.name+'</b><br>'+d.status+' Risk:'+d.risk+'<br>Acc:'+d.acc+'m<br>IP:'+d.ipCity+'<br>'+d.fakeReason);
+  markers.push(mk);
+ });
+ document.getElementById('total').innerText=data.length;
+ document.getElementById('realC').innerText=real;
+ document.getElementById('fakeC').innerText=fake;
+ document.getElementById('avgR').innerText=data.length?Math.round(sum/data.length):0;
+ document.getElementById('lastUpd').innerText='Last: '+new Date().toLocaleTimeString();
+ if(data.length) map.fitBounds(markers.map(m=>m.getLatLng()),{padding:[20,20]});
+}
+
+function focusDriver(i){
+ var d=allData[i];
+ map.setView([d.lat,d.lon],13);
+ document.getElementById('detail').innerHTML='<b>'+d.name+'</b> | '+d.status+' | Risk:'+d.risk+'/1000 | Acc:'+d.acc+'m | IP:'+d.ipCity+'<br>GPS:'+d.lat+','+d.lon+'<br>Reasons:'+d.fakeReason+'<br><a href="https://www.google.com/maps?q='+d.lat+','+d.lon+'" target="_blank" style="color:#00ff88">📍 Open Google Maps</a>';
+ markers[i].openPopup();
+}
+
+function filterFake(){ render(allData.filter(d=>d.status.includes('FAKE'))); }
+function filterReal(){ render(allData.filter(d=>d.status.includes('REAL'))); }
+function showAll(){ render(allData); }
+function clearData(){ if(confirm('Delete all?')){ localStorage.removeItem('v24_drivers'); allData=[]; render([]); } }
+function shareSummary(){
+ var txt='*v24 Admin Report - Saleem Shekh*%0A'+'Total:'+allData.length+' REAL:'+document.getElementById('realC').innerText+' FAKE:'+document.getElementById('fakeC').innerText+' AvgRisk:'+document.getElementById('avgR').innerText+'%0A'+allData.slice(0,5).map(d=>d.name+' '+d.status+' Risk'+d.risk+' '+d.ipCity).join('%0A');
+ window.open('https://wa.me/?text='+txt);
+}
+loadData();
+setInterval(loadData,5000);
+</script>
+</body></html>
