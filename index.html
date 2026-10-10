@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>v23 FINAL FIX</title>
+<title>v24 DRIVER + ADMIN - Saleem Shekh</title>
 <style>
 body{background:#040a18;color:#fff;font-family:system-ui;padding:10px;margin:0}
 .h{background:#001a00;border:1px solid #00ff88;padding:12px;border-radius:10px;text-align:center}
@@ -9,95 +9,63 @@ body{background:#040a18;color:#fff;font-family:system-ui;padding:10px;margin:0}
 input{width:100%;padding:12px;border-radius:8px;border:2px solid #00ff88;background:#0a1628;color:#fff}
 </style>
 </head><body>
-<div class="h"><b>🇦🇪 v23 FINAL FIX - Saleem Shekh</b><br><span style="font-size:10px">No Hang | Works Offline | Acc 0.0m = Fake Fix</span></div>
+<div class="h"><b>🇦🇪 v24 DRIVER + ADMIN - Saleem Shekh</b><br><span style="font-size:10px">No Hang | Acc 0.0m = Fake | Auto Save to Admin Dashboard</span></div>
 <div class="c">Name: <input id="t" value="Saleem Shekh"></div>
-<button type="button" class="btn" id="b" onclick="runV23()">🔍 RUN 20 LAYERS - v23 (100% Work)</button>
-<div id="out" class="c" style="min-height:80px">Status: Ready - v23 No Hang Version</div>
+<button type="button" class="btn" id="b" onclick="runV24()">🔍 RUN 20 LAYERS - v24</button>
+<div id="out" class="c" style="min-height:80px">Status: Ready - v24 Driver + Admin Connected</div>
 <script>
-console.log('v23 loaded OK');
 var btn=document.getElementById('b');
 if(btn){
- btn.addEventListener('click', function(){ console.log('click listener'); runV23(); });
- btn.addEventListener('touchstart', function(){ console.log('touch'); runV23(); });
+ btn.addEventListener('click', function(){ runV24(); });
+ btn.addEventListener('touchstart', function(){ runV24(); });
 }
-
-function runV23(){
+function runV24(){
  try{
   var out=document.getElementById('out');
   var name=document.getElementById('t').value||'Saleem Shekh';
-  
-  // IMMEDIATE FEEDBACK - 0 sec!
   out.innerHTML='✅ BUTTON CLICKED!<br>⏳ Step 1: Name = '+name+'<br>⏳ Step 2: Getting GPS...<br>Please ALLOW location popup!';
-  out.style.border='2px solid #00ff88';
-  out.style.background='#002a00';
+  out.style.border='2px solid #00ff88'; out.style.background='#002a00';
   try{if(navigator.vibrate) navigator.vibrate([100,50,100]);}catch(e){}
-  
-  // NO IP FETCH FIRST - Direct GPS!
   if(!navigator.geolocation){
-   showResult(name, 24.7136, 46.6753, 10, {city:'Riyadh',country_code:'SA',org:'No GPS - Backup'}, 'No Geolocation');
-   return;
+   showResult(name,24.7136,46.6753,10,{city:'Riyadh',country_code:'SA',org:'No GPS - Backup'},'No Geolocation'); return;
   }
-  
-  navigator.geolocation.getCurrentPosition(
-   function(pos){
+  navigator.geolocation.getCurrentPosition(function(pos){
     var lat=pos.coords.latitude, lon=pos.coords.longitude, acc=pos.coords.accuracy;
     out.innerHTML+='<br>✅ GPS Got: '+lat.toFixed(5)+','+lon.toFixed(5)+' Acc:'+acc.toFixed(1)+'m<br>⏳ Step 3: Getting IP...';
-    
-    // Now get IP with 2 sec timeout
     var ipDone=false;
-    var timer=setTimeout(function(){
-     if(!ipDone){ ipDone=true; showResult(name, lat, lon, acc, {city:'Riyadh',country_code:'SA',org:'Timeout Backup',country_name:'Saudi Arabia'}, 'Timeout'); }
-    },2000);
-    
-    fetch('https://ipapi.co/json/').then(r=>r.json()).then(ip=>{
-     if(!ipDone){ clearTimeout(timer); ipDone=true; showResult(name, lat, lon, acc, ip, 'OK'); }
-    }).catch(e=>{
-     if(!ipDone){ clearTimeout(timer); ipDone=true; showResult(name, lat, lon, acc, {city:'Riyadh',country_code:'SA',org:'Fetch Failed '+e.message,country_name:'Saudi Arabia'}, 'Failed'); }
-    });
-   },
-   function(err){
-    out.innerHTML='❌ GPS Error: '+err.message+' code:'+err.code+'<br>Using default Riyadh for test...<br>Tip: Allow location + Turn on GPS';
-    showResult(name, 24.7136, 46.6753, 10, {city:'Riyadh',country_code:'SA',org:'GPS Denied Backup',country_name:'Saudi Arabia'}, 'GPS Denied: '+err.message);
-   },
-   {enableHighAccuracy:true,timeout:15000,maximumAge:0}
-  );
-  
- }catch(ex){
-  document.getElementById('out').innerHTML='❌ JS Exception: '+ex.message+'<br>'+ex.stack;
- }
+    var timer=setTimeout(function(){ if(!ipDone){ ipDone=true; showResult(name,lat,lon,acc,{city:'Riyadh',country_code:'SA',org:'Timeout Backup',country_name:'Saudi Arabia'},'Timeout'); } },2000);
+    fetch('https://ipapi.co/json/').then(r=>r.json()).then(ip=>{ if(!ipDone){ clearTimeout(timer); ipDone=true; showResult(name,lat,lon,acc,ip,'OK'); } }).catch(e=>{ if(!ipDone){ clearTimeout(timer); ipDone=true; showResult(name,lat,lon,acc,{city:'Riyadh',country_code:'SA',org:'Fetch Failed',country_name:'Saudi Arabia'},'Failed'); } });
+   },function(err){
+    out.innerHTML='❌ GPS Error: '+err.message+' code:'+err.code+'<br>Using Riyadh default...';
+    showResult(name,24.7136,46.6753,10,{city:'Riyadh',country_code:'SA',org:'GPS Denied Backup',country_name:'Saudi Arabia'},'GPS Denied');
+   },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+ }catch(ex){ document.getElementById('out').innerHTML='❌ JS Exception: '+ex.message; }
 }
-
 function showResult(name, lat, lon, acc, ip, ipStatus){
  var out=document.getElementById('out');
  var org=(ip.org||'').toLowerCase();
  var isVPN=ip.country_code!=='SA'||org.includes('vpn')||org.includes('latitude')||org.includes('m247')||org.includes('hosting')||org.includes('choopa')||org.includes('sh');
- var isMock=(acc===0)||(acc<1.0); // FIXED! Acc 0.0m = Fake!
+ var isMock=(acc===0)||(acc<1.0);
  var isSaudi=lat>=16&&lat<=33&&lon>=34&&lon<=56;
- var oldRisk=0;
- if(ip.country_code!=='SA') oldRisk+=40;
- if(isVPN) oldRisk+=40;
- if(!isSaudi) oldRisk+=30;
- if(isMock) oldRisk+=50;
+ var oldRisk=0; if(ip.country_code!=='SA') oldRisk+=40; if(isVPN) oldRisk+=40; if(!isSaudi) oldRisk+=30; if(isMock) oldRisk+=50;
  var bankRisk=Math.min(1000, oldRisk*6);
  var isFake=isMock||!isSaudi||isVPN;
- var reasons=[];
- if(isMock) reasons.push('Acc '+acc.toFixed(1)+'m = Fake GPS App ON');
- if(!isSaudi) reasons.push('GPS Outside SA/UAE ('+lat.toFixed(2)+','+lon.toFixed(2)+' = Nigeria/Brazil)');
- if(isVPN) reasons.push('VPN ON - IP:'+ip.city+' '+ip.country_code+' ('+ip.org+')');
- 
+ var reasons=[]; if(isMock) reasons.push('Acc '+acc.toFixed(1)+'m = Fake GPS App ON'); if(!isSaudi) reasons.push('GPS Outside SA/UAE ('+lat.toFixed(2)+','+lon.toFixed(2)+')'); if(isVPN) reasons.push('VPN ON - IP:'+ip.city+' '+ip.country_code+' ('+ip.org+')');
+ // SAVE TO ADMIN
+ var entry={time:new Date().toLocaleString('en-GB',{hour12:false}),name:name,gps:lat.toFixed(4)+','+lon.toFixed(4),lat:lat,lon:lon,acc:acc.toFixed(2),ipCity:ip.city+' '+ip.country_code,risk:bankRisk,status:isFake?'FAKE 10%':'REAL 100%',fakeReason:reasons.join(',')};
+ try{ var arr=JSON.parse(localStorage.getItem('v24_drivers')||'[]'); arr.unshift(entry); localStorage.setItem('v24_drivers', JSON.stringify(arr.slice(0,200))); }catch(e){}
+ var adminUrl='admin.html?lat='+lat+'&lon='+lon+'&name='+encodeURIComponent(name)+'&acc='+acc.toFixed(2)+'&ip='+encodeURIComponent(ip.city+' '+ip.country_code)+'&risk='+bankRisk+'&status='+(isFake?'FAKE':'REAL')+'&gps='+lat.toFixed(4)+','+lon.toFixed(4)+'&reason='+encodeURIComponent(reasons.join(','));
  out.innerHTML=
  'Name: <b>'+name+'</b><br>'+
  'GPS: '+lat.toFixed(5)+','+lon.toFixed(5)+' Acc:'+acc.toFixed(1)+'m '+(isMock?'❌ <b>FAKE GPS YES - Acc 0.0m!</b>':'✅ REAL Acc OK')+'<br>'+
- 'IP: '+ip.city+' '+ip.country_code+' ('+ip.org+') IP Status:'+ipStatus+'<br>'+
- 'ISP: '+ip.org+' '+(isVPN?'❌ VPN':'✅ NO VPN')+'<br>'+
- 'VPN: '+(isVPN?'❌ YES':'✅ NO')+'<br>'+
- 'Location Inside SA: '+(isSaudi?'✅ YES':'❌ NO - Outside')+'<br>'+
- 'Timezone: '+Intl.DateTimeFormat().resolvedOptions().timeZone+'<br>'+
+ 'IP: '+ip.city+' '+ip.country_code+' ('+ip.org+')<br>'+
+ 'VPN: '+(isVPN?'❌ YES':'✅ NO')+' | Inside SA: '+(isSaudi?'✅ YES':'❌ NO')+'<br>'+
  'Risk Old: '+oldRisk+' | Bank Risk: '+bankRisk+'/1000<br>'+
- '<b>Fake Reasons:</b><br>'+(reasons.length?reasons.join('<br>'):'✅ None - REAL')+'<br><br>'+
+ '<b>Reasons:</b> '+(reasons.length?reasons.join('<br>'):'✅ REAL')+'<br><br>'+
  '<div style=padding:16px;border-radius:10px;background:'+(isFake?'#ef4444':'#22c55e')+';color:#000;font-weight:900;text-align:center;font-size:20px>'+(isFake?'❌ FAKE 10% - BLOCKED':'✅ REAL 100% - '+name.toUpperCase())+'</div>'+
- '<a href="https://wa.me/?text='+encodeURIComponent('*v23* '+(isFake?'FAKE':'REAL')+' '+name+' GPS:'+lat.toFixed(4)+','+lon.toFixed(4)+' Acc:'+acc+'m IP:'+ip.city+' Risk:'+bankRisk+' '+(isMock?'FakeGPS YES':'') )+'" style="display:block;padding:12px;background:#25D366;color:#000;border-radius:8px;font-weight:900;text-align:center;text-decoration:none;margin-top:10px">📲 Share WhatsApp</a>'+
- '<div style=font-size:9px;opacity:.6;margin-top:6px">v23 - No Hang - GPS first then IP - Acc 0.0m = Fake fixed - Button double listener</div>';
+ '<a href="https://wa.me/?text='+encodeURIComponent('*v24* '+(isFake?'FAKE':'REAL')+' '+name+' GPS:'+lat.toFixed(4)+','+lon.toFixed(4)+' Acc:'+acc.toFixed(1)+'m IP:'+ip.city+' Risk:'+bankRisk+' '+(isMock?'FakeGPS YES':''))+'" style="display:block;padding:12px;background:#25D366;color:#000;border-radius:8px;font-weight:900;text-align:center;text-decoration:none;margin-top:10px">📲 Share WhatsApp</a>'+
+ '<a href="'+adminUrl+'" style="display:block;padding:12px;background:#00aaff;color:#fff;border-radius:8px;font-weight:900;text-align:center;text-decoration:none;margin-top:8px">👑 Open Admin Dashboard - Save to Map</a>'+
+ '<div style=font-size:9px;opacity:.6;margin-top:6px">v24 - Auto saved to admin dashboard - Click above to see on map</div>';
 }
 </script>
 </body></html>
