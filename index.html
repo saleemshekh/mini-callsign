@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini Callsign v10 FINAL</title>
+<title>Mini Callsign v12 FINAL</title>
 <style>body{background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center} .card{background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.7;margin-top:15px} .b{padding:14px;border-radius:10px;font-weight:900;font-size:20px;text-align:center}</style>
 </head><body>
-<h1>🛡️ Mini Callsign v10 FINAL</h1>
-<p style="color:#22c55e;font-weight:900">VPN + Fake GPS 100% Detector - Dubai Ready</p>
-<button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK MY GPS + VPN NOW</button>
-<div id="out" class="card">Click button to start - v10</div>
+<h1>🛡️ Mini Callsign v12 FINAL</h1>
+<p style="color:#fbbf24;font-weight:900">v12 - VPN FORCE DETECT - Dubai Ready</p>
+<button onclick="check()" style="width:100%;padding:18px;background:#ef4444;border:none;border-radius:12px;font-weight:900;font-size:18px;color:#fff">📍 CHECK VPN IS ON?</button>
+<div id="out" class="card">v12 ready - VPN ON hai toh ab pakdega</div>
 <script>
-async function check(){
-let out=document.getElementById('out'); out.innerHTML='⏳ Checking IP & GPS...';
-let ip={city:'Unknown',country:'Unknown',country_code:'SA',org:'Unknown'};
+async function getIP(){
 try{
-let r=await fetch('https://ipwho.is/?fields=city,country,country_code,connection');
-let j=await r.json();
-if(j.success){ ip={city:j.city,country:j.country,country_code:j.country_code,org:j.connection.isp}; }
-}catch(e){ ip.org='Error - VPN blocking'; }
-function showPos(p){
+let r=await fetch('https://ipapi.co/json/'); let j=await r.json();
+return {city:j.city,country:j.country_name,country_code:j.country_code,org:j.org,ip:j.ip,ok:true};
+}catch(e){}
+try{
+let r=await fetch('https://ipwho.is/'); let j=await r.json();
+if(j.success) return {city:j.city,country:j.country,country_code:j.country_code,org:j.connection.isp,ip:j.ip,ok:true};
+}catch(e){}
+return {city:'Blocked',country:'Blocked by VPN',country_code:'XX',org:'VPN is blocking IP check - Suspected VPN',ok:false};
+}
+async function check(){
+let out=document.getElementById('out'); out.innerHTML='⏳ Checking IP... VPN ON hai toh Blocked dikhega';
+let ip=await getIP();
+navigator.geolocation.getCurrentPosition(p=>{
 let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
-let orgL=(ip.org||'').toLowerCase();
 let isMock=(acc===0);
-let isSaudiGPS=(lat>=16 && lat<=33 && lon>=34 && lon<=56);
-let isVPN=(orgL.includes('m247')||orgL.includes('vpn')||orgL.includes('datacamp')||orgL.includes('choopa')||orgL.includes('digitalocean')||orgL.includes('amazon')||orgL.includes('ovh')||orgL.includes('proxy')|| ip.country_code==='NL' || ip.country_code==='US' || ip.country==='Netherlands');
-let isForeign=isSaudiGPS && ip.country_code!=='SA';
-let mismatch=isMock||isVPN||isForeign;
-let score=100; let list=[];
-if(isMock){score=10; list.push('❌ Acc 0.0m = FAKE GPS APP');}
-if(isVPN){score=10; list.push('❌ VPN DETECTED: '+ip.org+' | IP: '+ip.city+', '+ip.country+' ('+ip.country_code+')');}
-if(isForeign){score=10; list.push('❌ GPS Riyadh but IP '+ip.country+' ('+ip.country_code+') - LOCATION MISMATCH');}
-if(!mismatch) list.push('✅ No VPN, GPS Real');
-let status=score>=80?'✅ REAL LOCATION':'❌ FAKE / VPN DETECTED';
-let color=score>=80?'#22c55e':'#ef4444';
-out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' '+(isSaudiGPS?'(Riyadh SA)':'')+'<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span style=color:#ef4444>❌ FAKE</span>':'✅ Good')+'<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>ISP:</b> '+ip.org+'<br><br><b>VPN:</b> '+(isVPN?'<span style=color:#ef4444>YES - '+ip.org+' ❌</span>':'<span style=color:#22c55e>NO ✅</span>')+'<br><b>IP vs GPS:</b> '+(mismatch?'<span style=color:#ef4444>MISMATCH ❌</span>':'<span style=color:#22c55e>Matched ✅</span>')+'<br><br><div class=b style=background:'+color+';color:#000>'+status+' - '+score+'%</div><br><div style=color:#fca5a5;font-size:13px>'+list.join('<br>')+'</div><br><button onclick="share()" style=width:100%;padding:12px;background:#25D366;border:none;border-radius:8px;font-weight:900>Share on WhatsApp</button>';
-window.lastResult=status+' '+score+'% GPS:'+lat.toFixed(3)+' IP:'+ip.country_code+'/'+ip.org+' VPN:'+isVPN;
+let isVPN=!ip.ok || ip.country_code!=='SA' || ip.country_code==='XX';
+let score=isVPN?10:100;
+let status=isVPN?'❌ VPN DETECTED - 10%':'✅ REAL LOCATION - 100%';
+let color=isVPN?'#ef4444':'#22c55e';
+out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+' (Riyadh)<br><b>Acc:</b> '+acc.toFixed(1)+'m<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>IP:</b> '+ (ip.ip||'') +'<br><b>ISP:</b> '+ip.org+'<br><br><b>VPN:</b> '+(isVPN?'<span style=color:#ef4444>YES - ON HAI ❌</span>':'<span style=color:#22c55e>NO - OFF hai ✅</span>')+'<br><br><div class=b style=background:'+color+';color:#000>'+status+'</div><br><small>'+(ip.ok?'IP mil gaya':'IP Blocked = VPN ON hai isliye')+'</small>';
+},e=>{out.innerHTML='GPS Error '+e.message+'<br>IP: '+ip.city+' '+ip.country;},{enableHighAccuracy:true,timeout:10000});
 }
-function err(e){ out.innerHTML='GPS Error: '+e.message+'<br>But IP check:<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>ISP:</b> '+ip.org+'<br><b>VPN:</b> '+(ip.country_code!=='SA'?'❌ YES VPN!':'✅ NO'); }
-navigator.geolocation.getCurrentPosition(showPos,err,{enableHighAccuracy:true,timeout:10000});
-}
-function share(){window.open('https://wa.me/?text='+encodeURIComponent(window.lastResult||'Check'));}
 </script></body></html>
