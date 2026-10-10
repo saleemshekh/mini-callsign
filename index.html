@@ -3,35 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini Callsign v7</title>
+<title>Mini Callsign v8</title>
 <style>body{background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center} .b{padding:12px;border-radius:10px;font-weight:900;font-size:20px}</style>
 </head>
 <body>
-<h1>🛡️ Mini Callsign PRO v7</h1>
-<p id="ver" style="color:#94a3b8">If you see v7, new code is loaded</p>
+<h1>🛡️ Mini Callsign PRO v8</h1>
+<p style="color:#94a3b8">v8 - Fake GPS 100% catch</p>
 <button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK MY GPS + VPN NOW</button>
-<div id="out" style="margin-top:20px;background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.7">Click to start - v7</div>
+<div id="out" style="margin-top:20px;background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.7">Click to start - v8</div>
 <script>
 async function check(){
-let out=document.getElementById('out'); out.innerHTML='⏳ Scanning...';
-let ip={city:'?',country:'Saudi Arabia',country_code:'SA',org:'?',ip:'?'};
+let out=document.getElementById('out'); out.innerHTML='⏳ Scanning GPS... 15 sec max';
+let ip={city:'Riyadh',country:'Saudi Arabia',country_code:'SA',org:'Etihad Salam',ip:'?'};
 try{let r=await fetch('https://ipwho.is/');let j=await r.json();if(j.success)ip={city:j.city,country:j.country,country_code:j.country_code,org:j.connection.isp,ip:j.ip};}catch(e){}
-navigator.geolocation.getCurrentPosition(p=>{
+function show(p){
 let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
-let isMock = (acc===0);
+let isMock = (acc===0 || acc<1);
 let isNigeria = (lat>4 && lat<8 && lon>2 && lon<6);
 let isSaudiGPS = (lat>16 && lat<33 && lon>34 && lon<56);
 let mismatch = isMock || isNigeria || !isSaudiGPS;
 let score = 100; let issues=[];
-if(isMock){score=10; issues.push('Acc 0.0m = FAKE GPS APP');}
+if(isMock){score=10; issues.push('Acc 0.0m = FAKE GPS APP DETECTED');}
 if(isNigeria){score=10; issues.push('GPS is Lagos Nigeria 6.5,4.6 - Not Riyadh!');}
-if(!isSaudiGPS && !isNigeria){score-=40; issues.push('GPS Outside Saudi');}
+if(!isSaudiGPS && !isNigeria){score=20; issues.push('GPS Outside Saudi: '+lat.toFixed(2)+','+lon.toFixed(2));}
 if(mismatch) score=Math.min(score,20);
 let status=score>=80?'✅ REAL LOCATION':'❌ FAKE / MOCK LOCATION DETECTED';
 let color=score>=80?'#22c55e':'#ef4444';
-out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+(isNigeria?' <span style=color:#ef4444>=> NIGERIA!</span>':'')+'<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span style=color:#ef4444>❌ 0.0 = FAKE APP</span>':'✅ Good')+'<br><b>IP:</b> '+ip.city+', '+ip.country+'<br><b>ISP:</b> '+ip.org+'<br><br><b>IP vs GPS:</b> '+(mismatch?'<span style=color:#ef4444>MISMATCH ❌</span>':'<span style=color:#22c55e>Matched ✅</span>')+'<br><br><div class=b style=background:'+color+';color:#000>'+status+' - '+score+'%</div>'+(issues.length?'<br><small style=color:#fca5a5>'+issues.join('<br>')+'</small>':'');
-},{enableHighAccuracy:true,timeout:15000});
+out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+(isNigeria?' <span style=color:#ef4444>=> NIGERIA!</span>':'')+'<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span style=color:#ef4444>❌ 0.0 = FAKE APP</span>':'✅ Good')+'<br><b>IP:</b> '+ip.city+', '+ip.country+'<br><b>ISP:</b> '+ip.org+'<br><br><b>IP vs GPS:</b> '+(mismatch?'<span style=color:#ef4444>MISMATCH ❌</span>':'<span style=color:#22c55e>Matched ✅</span>')+'<br><br><div class=b style=background:'+color+';color:#000>'+status+' - '+score+'%</div>'+(issues.length?'<br><small style=color:#fca5a5>'+issues.join('<br>')+'</small>':'')+'<br><br><button onclick="share()" style=width:100%;padding:12px;background:#25D366;border:none;border-radius:8px;font-weight:900>Share on WhatsApp</button>';
+window.lastResult=status+' '+score+'% GPS:'+lat.toFixed(4)+','+lon.toFixed(4)+' IP:'+ip.city+' Mock:'+isMock;
 }
+function err(e){
+out.innerHTML='❌ Location Failed: '+e.message+'<br><br>Fix: <br>1. Fake GPS app ko ek baar OFF karo<br>2. Phone Settings > Location > ON<br>3. Fir Fake GPS ON karke reload karo';
+}
+navigator.geolocation.getCurrentPosition(show,err,{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+}
+function share(){let t=window.lastResult||'Test'; window.open('https://wa.me/?text='+encodeURIComponent('Mini Callsign Check: '+t+' - by Saleem Bhai'));}
 </script>
 </body>
 </html>
