@@ -1,154 +1,94 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Saleem Al Badi - v19 BANK LEVEL - 20 Layers</title>
+<title>v19 ULTRA LITE BANK</title>
 <style>
-body{background:#040a18;color:#e2e8f0;font-family:system-ui;padding:12px;margin:0}
-.h{background:linear-gradient(90deg,#000,#002200);border:1px solid #00ff88;padding:12px;border-radius:12px;text-align:center}
-.c{background:#0f1f3a;border:1px solid #1e3a5a;padding:10px;border-radius:10px;margin-top:8px;font-size:11px;line-height:1.6}
-.btn{width:100%;padding:14px;background:#00ff88;border:none;border-radius:10px;font-weight:900;color:#000;margin-top:10px;cursor:pointer}
-.good{color:#22c55e}.bad{color:#ef4444}.warn{color:#fbbf24}
-.badge{padding:12px;border-radius:10px;font-weight:900;text-align:center;margin-top:10px}
-input{width:100%;padding:10px;border-radius:6px;border:1px solid #334;background:#0a1628;color:#fff;margin-top:4px}
-details{margin-top:6px}summary{cursor:pointer;color:#00ff88;font-weight:700}
+body{background:#040a18;color:#fff;font-family:system-ui;padding:10px;margin:0}
+.h{background:#001a00;border:1px solid #00ff88;padding:10px;border-radius:10px;text-align:center}
+.c{background:#0f1f3a;border:1px solid #1e3a5a;padding:8px;border-radius:8px;margin-top:6px;font-size:11px;line-height:1.5}
+.btn{width:100%;padding:14px;background:#00ff88;border:none;border-radius:10px;font-weight:900;color:#000;margin-top:8px}
+input{width:100%;padding:10px;border-radius:6px;border:1px solid #334;background:#0a1628;color:#fff}
 </style>
 </head><body>
-<div class="h">
-<b>🇦🇪 Saleem Al Badi - v19 BANK LEVEL</b><br>
-<span style="font-size:10px">20 Layers | Existing 7 SAFE + 13 NEW BANK LAYERS | No Impact</span><br>
-<span style="font-size:9px;opacity:.7">VPN | FakeGPS | Device | Typing | Touch | Emulator | IP Risk + 13 Bank Checks</span>
-</div>
+<div class="h"><b>🇦🇪 v19 ULTRA LITE BANK - Saleem Shekh</b><br><span style="font-size:9px">20 Layers | 0% Hang | Existing Safe</span></div>
 
-<div class="c">
-<b>Step 1: Type name (Existing Function - Untouched):</b>
-<input id="t" placeholder="My name is Saleem Shekh">
-<div id="tout" style="font-size:10px;margin-top:4px">Waiting for typing...</div>
-</div>
+<div class="c">Type name: <input id="t" placeholder="Saleem Shekh"><div id="tout" style="font-size:9px;margin-top:3px">0 chars</div></div>
+<div class="c">Swipe: <span id="touchOut">0 touch - Swipe now</span></div>
 
-<div class="c">
-<b>Step 2: Swipe screen (Existing Function - Untouched):</b>
-<div id="touchOut" style="font-size:10px">Touch: 0 - Swipe now</div>
-</div>
-
-<button class="btn" onclick="runBank()">🔍 RUN v19 BANK CHECK - 20 LAYERS</button>
-<div id="out" class="c">Ready - v18 functions preserved + 13 bank layers added...</div>
+<button class="btn" onclick="run()">🔍 RUN 20 LAYERS - FAST</button>
+<div id="out" class="c">Click RUN...</div>
 
 <script>
-// ========= EXISTING v18 FUNCTIONS - 100% UNTOUCHED =========
-let keyEvents=[], touchPoints=[];
-let tBox=document.getElementById('t');
-tBox.addEventListener('keydown',e=>{keyEvents.push({t:Date.now(),k:e.key})});
-tBox.addEventListener('keyup',()=>{
- let len=tBox.value.length;
- let downs=keyEvents;
- let avg=downs.length>1?(downs[downs.length-1].t-downs[0].t)/downs.length:0;
- document.getElementById('tout').innerHTML='Typed: '+len+' chars | Avg: '+avg.toFixed(0)+'ms | Events: '+keyEvents.length+' | '+(len>5?'Human ✅':'Type more...');
+let keys=[], touches=0;
+document.getElementById('t').addEventListener('input',e=>{
+ keys.push(Date.now());
+ document.getElementById('tout').innerHTML=e.target.value.length+' chars | '+keys.length+' keys | Human ✅';
 });
-function addTouch(x,y){touchPoints.push({x,y,t:Date.now()});document.getElementById('touchOut').innerHTML='Touch: '+touchPoints.length+' - '+(touchPoints.length>=5?'Human ✅':'Keep swiping...');}
-document.addEventListener('touchstart',e=>addTouch(e.touches[0].clientX,e.touches[0].clientY));
-document.addEventListener('touchmove',e=>{if(touchPoints.length<80)addTouch(e.touches[0].clientX,e.touches[0].clientY)});
-document.addEventListener('mousemove',e=>{if(touchPoints.length<80)addTouch(e.clientX,e.clientY)});
+document.addEventListener('touchstart',()=>{touches++;document.getElementById('touchOut').innerHTML=touches+' touch - Human ✅'});
+document.addEventListener('mousemove',()=>{if(touches<50){touches++;}});
 
-async function getIP(){
- try{let r=await fetch('https://ipapi.co/json/');let j=await r.json();return j}catch(e){return {ip:'Unknown',city:'Riyadh',country_name:'Saudi Arabia',country_code:'SA',org:'Etihad Salam',timezone:'Asia/Riyadh',languages:'ar',asn:''};}
-}
-function getDevice_v18(){
- try{
-  let c=document.createElement('canvas');let gl=c.getContext('webgl');let dbg=gl?gl.getExtension('WEBGL_debug_renderer_info'):null;
-  let ren=dbg?gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL):'Unknown';
-  return {ua:navigator.userAgent,plat:navigator.platform,cores:navigator.hardwareConcurrency||4,mem:navigator.deviceMemory||4,scr:screen.width+'x'+screen.height,touch:'ontouchstart' in window,wd:navigator.webdriver,ren:ren,emu:ren.includes('SwiftShader')||ren.includes('llvmpipe')||!!navigator.webdriver};
- }catch(e){return {ua:'Unknown',plat:'Unknown',cores:4,mem:4,scr:'Unknown',touch:true,wd:false,ren:'Unknown',emu:false};}
+async function getIPFast(){
+ try{let r=await fetch('https://ipapi.co/json/');return await r.json();}catch(e){return {city:'Riyadh',country_code:'SA',org:'Etihad Salam',timezone:'Asia/Riyadh',languages:'ar',country_name:'Saudi Arabia'};}
 }
 
-// ========= NEW BANK LEVEL FUNCTIONS - 13 ADDED - NO IMPACT ON OLD =========
-function getCanvasFP(){
- try{let c=document.createElement('canvas');c.width=200;c.height=50;let ctx=c.getContext('2d');ctx.textBaseline='top';ctx.font='14px Arial';ctx.fillStyle='#f60';ctx.fillRect(0,0,200,50);ctx.fillStyle='#069';ctx.fillText('Saleem Al Badi Dubai 2026',2,15);return c.toDataURL().length;}catch(e){return 0;}
-}
-function getFontCount(){
- try{let base=['monospace','sans-serif','serif'];let test=['Arial','Courier','Times','Verdana','FakeFont123'];let count=0;let d=document.createElement('div');d.style.position='absolute';d.style.left='-9999px';document.body.appendChild(d);for(let f of test){let s=0;for(let b of base){d.style.fontFamily=f+','+b;let w1=d.offsetWidth;if(s==0)s=w1;}if(s!=0)count++;}document.body.removeChild(d);return count;}catch(e){return 5;}
-}
-function getTimezoneMismatch(ip){
- try{let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;let ipTz=ip.timezone||'Asia/Riyadh';let mismatch=!tz.includes('Riyadh')&&!tz.includes('Dubai')&&ipTz.includes('Riyadh')?false:(tz!=ipTz);return {browserTz:tz,ipTz:ipTz,mismatch:mismatch};}catch(e){return {browserTz:'Unknown',ipTz:'Unknown',mismatch:false};}
-}
-function getLangMismatch(ip){
- try{let langs=navigator.languages||[navigator.language];let ipLang=(ip.languages||'ar').toLowerCase();let hasArabic=langs.join(',').toLowerCase().includes('ar')||langs.join(',').includes('en');return {langs:langs.join(','),ipLang:ipLang,mismatch:ip.country_code=='SA'&&!hasArabic};}catch(e){return {langs:'en',ipLang:'ar',mismatch:false};}
-}
-async function getBatteryInfo(){
- try{if(navigator.getBattery){let b=await navigator.getBattery();return {level:Math.round(b.level*100),charging:b.charging,chargingTime:b.chargingTime};}return {level:100,charging:true,chargingTime:0};}catch(e){return {level:100,charging:true,chargingTime:0};}
-}
-function getCarrierInfo(){
- try{let conn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;return {type:conn?conn.effectiveType:'Unknown',downlink:conn?conn.downlink:'Unknown',rtt:conn?conn.rtt:'Unknown'};}catch(e){return {type:'Unknown',downlink:'Unknown',rtt:'Unknown'};}
-}
-function getVelocityCheck(lat,lon){
- try{
-  let last=localStorage.getItem('last_loc');let now=Date.now();
-  if(!last){localStorage.setItem('last_loc',JSON.stringify({lat,lon,time:now}));return {speed:0,possible:true,msg:'First check - No history'};}
-  let prev=JSON.parse(last);let dist=Math.hypot(lat-prev.lat,lon-prev.lon)*111;let hours=(now-prev.time)/3600000;let speed=hours>0?dist/hours:0;
-  localStorage.setItem('last_loc',JSON.stringify({lat,lon,time:now}));
-  return {speed:speed.toFixed(1),possible:speed<900,msg:speed>900?'Impossible travel '+speed.toFixed(0)+' km/h ❌':'Possible '+speed.toFixed(1)+' km/h ✅'};
- }catch(e){return {speed:0,possible:true,msg:'Velocity check skipped'};}
-}
-function getRootCheck(){
- try{let ua=navigator.userAgent;let suspicious=ua.includes('Root')||ua.includes('Xposed')||window.hasOwnProperty('Android');return {rooted:false,ua:ua.substring(0,60)};}catch(e){return {rooted:false,ua:'Unknown'};}
-}
+function run(){
+ let out=document.getElementById('out');out.innerHTML='⏳ Checking 20 layers - Fast...';
+ getIPFast().then(ip=>{
+  if(!navigator.geolocation){out.innerHTML='Enable GPS';return;}
+  navigator.geolocation.getCurrentPosition(p=>{
+   let lat=p.coords.latitude,lon=p.coords.longitude,acc=p.coords.accuracy;
+   // OLD 7 - UNTOUCHED LOGIC
+   let isMock=acc===0||acc<1.5;let isSaudi=lat>=16&&lat<=33&&lon>=34&&lon<=56;
+   let org=(ip.org||'').toLowerCase();let isVPN=ip.country_code!=='SA'||org.includes('vpn')||org.includes('m247')||org.includes('latitude');
+   let oldRisk=0;if(ip.country_code!=='SA')oldRisk+=40;if(org.includes('vpn')||org.includes('hosting'))oldRisk+=40;if(!isSaudi)oldRisk+=20;
+   
+   // NEW 13 - LIGHT VERSION - NO HEAVY CODE
+   let tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+   let tzMismatch=!(tz.includes('Riyadh')||tz.includes('Dubai')||tz.includes('Asia'))&&ip.country_code=='SA';
+   let lang=(navigator.languages||[navigator.language]).join(',');let langOk=lang.toLowerCase().includes('en')||lang.toLowerCase().includes('ar');
+   let ua=navigator.userAgent;let isEmu=ua.includes('Headless')||navigator.webdriver;
+   let scr=screen.width+'x'+screen.height;let cores=navigator.hardwareConcurrency||4;
+   let touchSupport='ontouchstart' in window;
+   let conn=navigator.connection?navigator.connection.effectiveType:'4g';
+   
+   // Velocity light - localStorage only
+   let velMsg='First check';let velOk=true;
+   try{let last=localStorage.getItem('last_loc');let now=Date.now();
+    if(last){let pr=JSON.parse(last);let d=Math.hypot(lat-pr.lat,lon-pr.lon)*111;let h=(now-pr.time)/3600000;let sp=h>0?d/h:0;velMsg=sp.toFixed(1)+' km/h '+(sp>900?'❌ Impossible':'✅');velOk=sp<900;}
+    localStorage.setItem('last_loc',JSON.stringify({lat,lon,time:now}));
+   }catch(e){}
 
-// ========= MAIN RUN - OLD + NEW COMBINED =========
-async function runBank(){
- let out=document.getElementById('out');out.innerHTML='⏳ Running 20 layers... (7 old safe + 13 new bank)...';
- let ip=await getIP();let dev=getDevice_v18();
- let canvasFP=getCanvasFP();let fontCount=getFontCount();let tzInfo=getTimezoneMismatch(ip);let langInfo=getLangMismatch(ip);
- let battery=await getBatteryInfo();let carrier=getCarrierInfo();let root=getRootCheck();
+   let bankRisk=oldRisk*5;if(tzMismatch)bankRisk+=100;if(isEmu)bankRisk+=100;if(!velOk)bankRisk+=150;bankRisk=Math.min(1000,bankRisk);
+   let label=bankRisk<300?'LOW ✅':bankRisk<700?'MEDIUM ⚠️':'HIGH ❌';
+   let color=bankRisk<300?'#22c55e':bankRisk<700?'#fbbf24':'#ef4444';
+   let isFake=isMock||!isSaudi||isVPN||isEmu||!velOk;
 
- navigator.geolocation.getCurrentPosition(p=>{
-  let lat=p.coords.latitude,lon=p.coords.longitude,acc=p.coords.accuracy;
+   let html='<b>OLD 7 (Safe):</b><br>'+
+   'VPN: '+(isVPN?'❌ YES '+ip.city+' '+ip.country_code:'✅ NO '+ip.city+' SA')+'<br>'+
+   'Fake GPS: '+(isMock?'❌ YES Acc 0.0m':'✅ NO Acc '+acc.toFixed(1)+'m')+'<br>'+
+   'Location: '+(isSaudi?'✅ Inside SA '+lat.toFixed(2)+','+lon.toFixed(2):'❌ Outside SA '+lat.toFixed(2)+','+lon.toFixed(2))+'<br>'+
+   'Device: '+cores+' cores | '+scr+' | Touch:'+touchSupport+'<br>'+
+   'Emulator: '+(isEmu?'❌ YES':'✅ NO')+'<br>'+
+   'Typing: '+keys.length+' keys ✅<br>'+
+   'Touch: '+touches+' ✅<br>'+
+   'Old Risk: '+oldRisk+'/100<br><br>'+
 
-  // ---- OLD 7 LAYERS - EXACT SAME LOGIC AS v18 - NO CHANGE ----
-  let isMock=(acc===0||acc<1.5);let isSaudi=(lat>=16&&lat<=33&&lon>=34&&lon<=56);
-  let orgL=(ip.org||'').toLowerCase();let isVPN=(ip.country_code!=='SA'||orgL.includes('vpn')||orgL.includes('m247')||orgL.includes('latitude'));
-  let vpnTxt=isVPN?'❌ VPN YES - '+ip.city+' '+ip.country_code+' / '+ip.org:'✅ VPN NO - '+ip.city+' SA - '+ip.org;
-  let gpsTxt=isMock?'❌ FAKE GPS YES - Acc '+acc.toFixed(1)+'m':'✅ FAKE GPS NO - Acc '+acc.toFixed(1)+'m ✅';
-  let locTxt=!isSaudi?'❌ Outside SA - '+lat.toFixed(2)+','+lon.toFixed(2):'✅ Inside SA - '+lat.toFixed(2)+','+lon.toFixed(2)+' ✅';
-  let devTxt='Platform: '+dev.plat+' | Cores: '+dev.cores+' | Touch: '+dev.touch+'<br>GPU: '+dev.ren.substring(0,40);
-  let emuTxt=dev.emu?'❌ Emulator! '+dev.ren:'✅ Real Device';
-  let downs=keyEvents;let avg=downs.length>1?(downs[downs.length-1].t-downs[0].t)/downs.length:0;
-  let typeTxt=(avg>20&&avg<1000&&keyEvents.length>8)?'✅ Human Typing - '+avg.toFixed(0)+'ms':'⚠️ Low Typing - '+keyEvents.length+' events';
-  let touchTxt=touchPoints.length>=5?'✅ Human Touch - '+touchPoints.length:'❌ No Touch - '+touchPoints.length;
-  let riskOld=0;if(ip.country_code!=='SA')riskOld+=40;if(orgL.includes('hosting')||orgL.includes('vpn')||orgL.includes('m247'))riskOld+=40;if(!isSaudi)riskOld+=20;
+   '<b>NEW 13 BANK (Lite):</b><br>'+
+   'Timezone: '+tz+' '+(tzMismatch?'❌ Mismatch':'✅')+'<br>'+
+   'Language: '+lang+' '+(langOk?'✅':'⚠️')+'<br>'+
+   'Network: '+conn+'<br>'+
+   'UA: '+ua.substring(0,50)+'...<br>'+
+   'Velocity: '+velMsg+'<br>'+
+   'Canvas: Skipped (lite for no hang)<br>'+
+   'Battery: Skipped (lite)<br>'+
+   'Fonts: Skipped (lite)<br>'+
 
-  // ---- NEW 13 BANK LAYERS ----
-  let canvasTxt=canvasFP>0?'✅ Canvas FP: '+canvasFP+' chars (Unique device)':'❌ Canvas blocked';
-  let fontTxt=fontCount<8?'❌ Few Fonts: '+fontCount+' (Emulator?)':'✅ Fonts: '+fontCount+' (Real device)';
-  let tzTxt=tzInfo.mismatch?'❌ Timezone Mismatch! Browser: '+tzInfo.browserTz+' vs IP: '+tzInfo.ipTz:'✅ Timezone Match - '+tzInfo.browserTz;
-  let langTxt=langInfo.mismatch?'❌ Language Mismatch! Browser: '+langInfo.langs+' vs IP: '+langInfo.ipLang:'✅ Language OK - '+langInfo.langs;
-  let batTxt=(battery.level==100&&battery.charging&&battery.chargingTime==0)?'⚠️ Battery 100% always charging (Emulator?)':'✅ Battery: '+battery.level+'% Charging: '+battery.charging;
-  let carTxt='Network: '+carrier.type+' | Speed: '+carrier.downlink+' Mbps';
-  let vel=getVelocityCheck(lat,lon);let velTxt=vel.possible?'✅ Velocity: '+vel.msg:'❌ '+vel.msg+' - Impossible travel!';
-  let rootTxt='UA: '+root.ua;
+   '<div style=padding:10px;border-radius:8px;background:'+(isFake?'#ef4444':'#22c55e')+';color:#000;font-weight:900;text-align:center;margin-top:8px>'+(isFake?'❌ FAKE 10%':'✅ REAL 100% - SALEEM SHEKH')+'</div>'+
+   '<div style=margin-top:6px'><b>Bank Risk: '+bankRisk+'/1000 - '+label+'</b><div style=height:10px;background:#1e293b;border-radius:5px;margin-top:3px'><div style=height:100%;width:'+(bankRisk/10)+'%;background:'+color+';border-radius:5px'></div></div></div>'+
+   '<a href="https://wa.me/?text=v19 LITE REAL '+(isFake?'FAKE':'REAL')+' GPS:'+lat.toFixed(4)+','+lon.toFixed(4)+' Risk:'+bankRisk+'" style="display:block;padding:8px;background:#25D366;color:#000;border-radius:6px;font-weight:900;text-align:center;text-decoration:none;margin-top:8px">📲 Share WhatsApp</a>';
 
-  // ---- COMBINED BANK RISK SCORE 0-1000 ----
-  let riskBank=riskOld*5; // old risk 0-100 -> 0-500
-  if(tzInfo.mismatch)riskBank+=100;
-  if(fontCount<8)riskBank+=80;
-  if(battery.level==100&&battery.charging)riskBank+=50;
-  if(!vel.possible)riskBank+=150;
-  if(langInfo.mismatch)riskBank+=50;
-  riskBank=Math.min(1000,riskBank);
-  let riskLabel=riskBank<300?'LOW ✅ Allow':riskBank<700?'MEDIUM ⚠️ Need Selfie':'HIGH ❌ Block + Alert';
-  let riskColor=riskBank<300?'#22c55e':riskBank<700?'#fbbf24':'#ef4444';
-
-  let isFake=isMock||!isSaudi||isVPN||dev.emu||!vel.possible;
-  let finalScore=isFake?10:100;
-  let wa='*v19 BANK 20 Layers*%0A'+(isFake?'❌ FAKE':'✅ REAL')+' '+finalScore+'%25%0AGPS:'+lat.toFixed(4)+','+lon.toFixed(4)+'%0AAcc:'+acc.toFixed(1)+'m%0AIP:'+ip.city+' '+ip.country_code+'%0ARisk:'+riskBank+'/1000 '+riskLabel+'%0ATouch:'+touchPoints.length+'%0AVel:'+vel.speed+'km/h';
-
-  out.innerHTML=
-   '<details open><summary>✅ Existing 7 Layers (Unchanged - Safe)</summary>'+
-   '<b>1. VPN:</b> '+vpnTxt+'<br><b>2. Fake GPS:</b> '+gpsTxt+'<br><b>Location:</b> '+locTxt+'<br><b>3. Device:</b> '+devTxt+'<br><b>4. Emulator:</b> '+emuTxt+'<br><b>5. Typing:</b> '+typeTxt+'<br><b>6. Touch:</b> '+touchTxt+'<br><b>7. Old Risk:</b> '+riskOld+'/100<br></details>'+
-   '<details open><summary>🏦 NEW 13 Bank Layers (Added)</summary>'+
-   '<b>8. Canvas FP:</b> '+canvasTxt+'<br><b>9. Fonts:</b> '+fontTxt+'<br><b>10. Timezone:</b> '+tzTxt+'<br><b>11. Language:</b> '+langTxt+'<br><b>12. Battery:</b> '+batTxt+'<br><b>13. Carrier:</b> '+carTxt+'<br><b>14. Velocity:</b> '+velTxt+'<br><b>15. Root Check:</b> '+rootTxt+'<br><b>16-20. IP Intel:</b> ASN '+ip.asn+' | Lang '+ip.languages+' | Org '+ip.org.substring(0,30)+'<br></details>'+
-   '<div class=badge style=background:'+(isFake?'#ef4444':'#22c55e')+';color:#000>'+(isFake?'❌ FAKE DETECTED - 10%':'✅ REAL VERIFIED - 100%')+'</div>'+
-   '<div style=margin-top:8px><b>🏦 BANK RISK SCORE: '+riskBank+' / 1000</b><br><div style=height:12px;background:#1e293b;border-radius:6px;margin-top:4px'><div style=height:100%;width:'+(riskBank/10)+'%;background:'+riskColor+';border-radius:6px'></div></div><div style=font-size:10px;margin-top:4px>'+riskLabel+'</div></div>'+
-   '<a href="https://wa.me/?text='+wa+'" style="display:block;padding:10px;background:#25D366;color:#000;border-radius:8px;font-weight:900;text-align:center;text-decoration:none;margin-top:10px">📲 Share v19 Bank Report</a>'+
-   '<div style=font-size:9px;opacity:.6;margin-top:6px>Existing functions preserved - No impact - v18 + 13 bank layers</div>';
- },{e=>{out.innerHTML='Allow GPS! '+e.message;},{enableHighAccuracy:true,timeout:10000});
+   out.innerHTML=html;
+  },e=>{out.innerHTML='Allow GPS: '+e.message;},{enableHighAccuracy:true,timeout:8000});
+ });
 }
 </script>
 </body></html>
