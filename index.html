@@ -1,168 +1,90 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Saleem Al Badi - v17 PRO Enterprise Fraud Detection</title>
+<title>Saleem Al Badi - v18 MOBILE PRO</title>
 <style>
 body{background:#060d1c;color:#e2e8f0;font-family:system-ui;padding:14px;margin:0}
 .header{background:linear-gradient(90deg,#001a00,#003300);border:1px solid #00ff00;padding:14px;border-radius:12px;text-align:center}
-h1{margin:0;font-size:18px;color:#00ff88}h2{font-size:14px;color:#00ff88;margin:18px 0 8px;border-bottom:1px solid #1a3a2a;padding-bottom:4px}
+h1{margin:0;font-size:18px;color:#00ff88}
 .card{background:#0f1f3a;border:1px solid #1e3a5a;padding:12px;border-radius:10px;margin-top:10px;font-size:12px;line-height:1.7}
-.badge{padding:12px;border-radius:10px;font-weight:900;text-align:center;font-size:16px}
-.good{color:#22c55e}.bad{color:#ef4444}.warn{color:#fbbf24}
+.btn{width:100%;padding:14px;background:#00ff88;border:none;border-radius:10px;font-weight:900;color:#000;margin-top:10px}
 input{width:100%;padding:12px;border-radius:8px;border:1px solid #334155;background:#0a1628;color:#fff;margin-top:8px}
-.btn{width:100%;padding:14px;background:#00ff88;border:none;border-radius:10px;font-weight:900;color:#000;margin-top:10px;cursor:pointer}
-.score-bar{height:10px;background:#1e293b;border-radius:5px;overflow:hidden;margin-top:6px}
-.score-fill{height:100%;transition:width.5s}
+.good{color:#22c55e}.bad{color:#ef4444}
 </style>
 </head><body>
 <div class="header">
-<h1>🇦🇪 Saleem Al Badi Transport - v17 PRO</h1>
-<div style="font-size:11px;margin-top:4px">ENTERPRISE FRAUD DETECTION - 6 LAYERS</div>
-<div style="font-size:10px;opacity:.7;margin-top:2px">VPN | Fake GPS | Device | Typing | Mouse | Emulator | IP Risk</div>
+<h1>🇦🇪 Saleem Al Badi - v18 MOBILE PRO</h1>
+<div style="font-size:11px;margin-top:4px">Saleem Shekh - Enterprise 6 Layers</div>
+<div style="font-size:10px;opacity:.7">VPN | Fake GPS | Device | Typing | Touch | Emulator | IP Risk</div>
 </div>
 
 <div class="card">
-<b>Step 1: Type this sentence to check typing pattern:</b><br>
-<i>"I am driver in Riyadh"</i>
-<input id="typeBox" placeholder="Type here: I am driver in Riyadh" autocomplete="off">
-<div id="typingOut" style="margin-top:6px;font-size:11px;opacity:.8">Waiting for typing...</div>
+<b>Step 1: Type your name to verify human:</b>
+<input id="typeBox" placeholder="Type: My name is Saleem Shekh" autocomplete="off">
+<div id="typingOut" style="margin-top:6px;font-size:11px">Typed: 0 chars - Type now!</div>
 </div>
 
 <div class="card">
-<b>Step 2: Move your mouse randomly for 3 seconds</b>
-<div id="mouseOut" style="font-size:11px;margin-top:6px">Mouse points: 0 - Move mouse now!</div>
-<div class="score-bar"><div id="mouseBar" class="score-fill" style="width:0%;background:#00ff88"></div></div>
+<b>Step 2: Swipe / Touch screen randomly 5 times</b>
+<div id="touchOut" style="font-size:11px;margin-top:6px">Touch points: 0 - Swipe screen now!</div>
+<div style="height:10px;background:#1e293b;border-radius:5px;margin-top:6px"><div id="touchBar" style="height:100%;width:0%;background:#00ff88;border-radius:5px"></div></div>
 </div>
 
-<button class="btn" onclick="runAll()">🔍 RUN FULL FRAUD CHECK - 6 LAYERS</button>
-
-<div id="out" class="card">Press RUN to start enterprise check...</div>
+<button class="btn" onclick="runAll()">🔍 RUN FULL CHECK - Saleem Shekh</button>
+<div id="out" class="card">Ready - Type and swipe, then press RUN</div>
 
 <script>
-let keyEvents=[], mousePoints=[], mouseLast={x:0,y:0,time:0};
-
-document.getElementById('typeBox').addEventListener('keydown',e=>{
- keyEvents.push({key:e.key,type:'down',time:Date.now()});
-});
-document.getElementById('typeBox').addEventListener('keyup',e=>{
- keyEvents.push({key:e.key,type:'up',time:Date.now()});
- let txt=document.getElementById('typeBox').value;
- if(keyEvents.length>5){
-  let downs=keyEvents.filter(k=>k.type=='down');
-  let avg=0;for(let i=1;i<downs.length;i++)avg+=downs[i].time-downs[i-1].time;
-  avg=avg/(downs.length-1);
-  document.getElementById('typingOut').innerHTML='Typed: '+txt.length+' chars | Avg speed: '+(avg>0?avg.toFixed(0):0)+'ms | Events: '+keyEvents.length+' | '+(avg>30&&avg<800?'Human ✅':'Bot/Robot ❌');
- }
+let keyEvents=[], touchPoints=[];
+let typeBox=document.getElementById('typeBox');
+typeBox.addEventListener('keydown',e=>{keyEvents.push({t:Date.now(),k:e.key,d:'down'})});
+typeBox.addEventListener('keyup',e=>{
+ keyEvents.push({t:Date.now(),k:e.key,d:'up'});
+ let len=typeBox.value.length;
+ let downs=keyEvents.filter(k=>k.d=='down');
+ let avg=downs.length>1?(downs[downs.length-1].t-downs[0].t)/downs.length:0;
+ document.getElementById('typingOut').innerHTML='Typed: '+len+' chars | Avg: '+avg.toFixed(0)+'ms | Events: '+keyEvents.length+' | '+(len>5?'Human ✅':'Type more...');
 });
 
-document.addEventListener('mousemove',e=>{
- let now=Date.now();
- mousePoints.push({x:e.clientX,y:e.clientY,time:now,speed:Math.hypot(e.clientX-mouseLast.x,e.clientY-mouseLast.y)});
- mouseLast={x:e.clientX,y:e.clientY,time:now};
- if(mousePoints.length%10==0){
-  document.getElementById('mouseOut').innerHTML='Mouse points: '+mousePoints.length+' | Avg speed: '+(mousePoints.reduce((a,b)=>a+b.speed,0)/mousePoints.length).toFixed(1)+'px';
-  document.getElementById('mouseBar').style.width=Math.min(100,mousePoints.length)+'%';
- }
-});
+function addTouch(x,y){touchPoints.push({x,y,t:Date.now()});document.getElementById('touchOut').innerHTML='Touch points: '+touchPoints.length+' - '+(touchPoints.length>=5?'Human ✅ Ready!':'Keep swiping... ('+(5-touchPoints.length)+' left)');document.getElementById('touchBar').style.width=Math.min(100,touchPoints.length*20)+'%';}
+document.addEventListener('touchstart',e=>{addTouch(e.touches[0].clientX,e.touches[0].clientY)});
+document.addEventListener('touchmove',e=>{if(touchPoints.length<50)addTouch(e.touches[0].clientX,e.touches[0].clientY)});
+document.addEventListener('mousemove',e=>{addTouch(e.clientX,e.clientY)});
 
 async function getIP(){
- try{
-  let r=await fetch('https://ipapi.co/json/');
-  let j=await r.json();
-  return {ip:j.ip,city:j.city,country:j.country_name,code:j.country_code,org:j.org,asn:j.asn,timezone:j.timezone,region:j.region};
- }catch(e){return {ip:'Unknown',city:'Riyadh',country:'Saudi Arabia',code:'SA',org:'Etihad Salam',asn:'',timezone:'Asia/Riyadh',region:'Riyadh'};}
+ try{let r=await fetch('https://ipapi.co/json/');let j=await r.json();return {ip:j.ip,city:j.city,country:j.country_name,code:j.country_code,org:j.org,timezone:j.timezone}}catch(e){return {ip:'Unknown',city:'Riyadh',country:'Saudi Arabia',code:'SA',org:'Etihad Salam',timezone:'Asia/Riyadh'};}
 }
-
-function getDeviceInfo(){
- let gl=document.createElement('canvas').getContext('webgl');
- let debug=gl?gl.getExtension('WEBGL_debug_renderer_info'):null;
- let renderer=debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):'Unknown';
- let vendor=debug?gl.getParameter(debug.UNMASKED_VENDOR_WEBGL):'Unknown';
- return {
-  userAgent:navigator.userAgent,
-  platform:navigator.platform,
-  cores:navigator.hardwareConcurrency||'Unknown',
-  memory:navigator.deviceMemory||'Unknown',
-  screen:screen.width+'x'+screen.height,
-  colorDepth:screen.colorDepth,
-  touch:'ontouchstart' in window,
-  webdriver:navigator.webdriver,
-  languages:navigator.languages.join(','),
-  timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
-  renderer:renderer,
-  vendor:vendor,
-  isEmulator: renderer.includes('SwiftShader')||renderer.includes('llvmpipe')||navigator.userAgent.includes('Headless')||navigator.webdriver
- };
-}
-
-function calcIPRisk(ip, gpsLat, gpsLon){
- let risk=0, reasons=[];
- let org=(ip.org||'').toLowerCase();
- if(ip.code!=='SA'){risk+=40;reasons.push('+40 Foreign IP ('+ip.code+')');}
- if(org.includes('vpn')||org.includes('m247')||org.includes('latitude')||org.includes('datacamp')||org.includes('hosting')||org.includes('choopa')||org.includes('ovh')||org.includes('digitalocean')){risk+=40;reasons.push('+40 Hosting/VPN ISP ('+ip.org+')');}
- if(ip.timezone &&!ip.timezone.includes('Riyadh') &&!ip.timezone.includes('Dubai')){risk+=20;reasons.push('+20 Timezone mismatch ('+ip.timezone+')');}
- return {score:Math.min(100,risk),reasons:reasons};
+function getDevice(){
+ let c=document.createElement('canvas').getContext('webgl');let ext=c?c.getExtension('WEBGL_debug_renderer_info'):null;
+ let ren=ext?c.getParameter(ext.UNMASKED_RENDERER_WEBGL):'Unknown';
+ return {ua:navigator.userAgent,plat:navigator.platform,cores:navigator.hardwareConcurrency||4,mem:navigator.deviceMemory||4,scr:screen.width+'x'+screen.height,touch:'ontouchstart' in window,wd:navigator.webdriver,ren:ren,emu:ren.includes('SwiftShader')||ren.includes('llvmpipe')||navigator.userAgent.includes('Headless')||!!navigator.webdriver};
 }
 
 async function runAll(){
- let out=document.getElementById('out');
- out.innerHTML='⏳ Running 6-layer check...';
- let ip=await getIP();
- let device=getDeviceInfo();
-
+ let out=document.getElementById('out');out.innerHTML='⏳ Getting IP & Location... Allow GPS if asked...';
+ let ip=await getIP();let dev=getDevice();
+ if(!navigator.geolocation){out.innerHTML='❌ GPS not supported';return;}
  navigator.geolocation.getCurrentPosition(p=>{
-  let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
-  let isMock=(acc===0||acc<1.5);
-  let isSaudi=(lat>=16&&lat<=33&&lon>=34&&lon<=56);
-  let orgL=(ip.org||'').toLowerCase();
-  let isVPN=(ip.code!=='SA'||orgL.includes('vpn')||orgL.includes('m247')||orgL.includes('latitude'));
+  let lat=p.coords.latitude,lon=p.coords.longitude,acc=p.coords.accuracy;
+  let isMock=(acc===0||acc<1.5);let isSaudi=(lat>=16&&lat<=33&&lon>=34&&lon<=56);
+  let orgL=(ip.org||'').toLowerCase();let isVPN=(ip.code!=='SA'||orgL.includes('vpn')||orgL.includes('m247')||orgL.includes('latitude')||orgL.includes('datacamp')||orgL.includes('hosting'));
 
-  // 1. VPN Detection
-  let vpnStatus=isVPN?'❌ VPN DETECTED - '+ip.city+', '+ip.country+' ('+ip.code+') - '+ip.org:'✅ No VPN - '+ip.city+' '+ip.code;
+  let vpnTxt=isVPN?'❌ VPN - '+ip.city+' '+ip.code+' ('+ip.org+')':'✅ No VPN - '+ip.city+' SA - '+ip.org;
+  let gpsTxt=isMock?'❌ FAKE GPS - Acc '+acc.toFixed(1)+'m (Fake App)':'✅ Real GPS - Acc '+acc.toFixed(1)+'m';
+  let locTxt=!isSaudi?'❌ Outside SA - '+lat.toFixed(4)+','+lon.toFixed(4):'✅ Inside SA - '+lat.toFixed(4)+','+lon.toFixed(4);
 
-  // 2. Fake GPS
-  let gpsStatus=isMock?'❌ FAKE GPS - Acc '+acc.toFixed(1)+'m = Fake App!':'✅ Real GPS - Acc '+acc.toFixed(1)+'m';
-  let locationStatus=!isSaudi?'❌ Location Outside SA/UAE - '+lat.toFixed(2)+','+lon.toFixed(2)+' (Nigeria?)':'✅ Inside SA/UAE - '+lat.toFixed(2)+','+lon.toFixed(2);
+  let devTxt=dev.emu?'❌ EMULATOR - '+dev.ren:'✅ Real Device - '+dev.plat+' - '+dev.cores+' cores - Touch: '+dev.touch;
+  let downs=keyEvents.filter(k=>k.d=='down');let avg=downs.length>1?(downs[downs.length-1].t-downs[0].t)/downs.length:0;
+  let typeTxt=(keyEvents.length>8&&avg>20&&avg<1000)?'✅ Human Typing - '+keyEvents.length+' keys, '+avg.toFixed(0)+'ms':'⚠️ Low Typing - '+keyEvents.length+' events';
+  let touchTxt=touchPoints.length>=5?'✅ Human Touch - '+touchPoints.length+' swipes':'❌ No Touch - '+touchPoints.length+' (Bot?)';
+  let emuTxt=dev.emu?'❌ Emulator/Headless Detected':'✅ Real Phone - No Emulator';
 
-  // 3. Device Info
-  let deviceStatus=device.isEmulator?'❌ Emulator/Simulator Detected - '+device.renderer:'✅ Real Device - '+device.platform+' - '+device.cores+' cores - '+device.screen;
+  let risk=0;if(ip.code!=='SA')risk+=40;if(orgL.includes('vpn')||orgL.includes('hosting')||orgL.includes('m247'))risk+=40;if(ip.timezone&&!ip.timezone.includes('Riyadh'))risk+=20;
+  let riskTxt=risk+' / 100 - '+(risk<30?'LOW ✅':risk<70?'MEDIUM ⚠️':'HIGH ❌');
 
-  // 4. Typing Biometrics
-  let downs=keyEvents.filter(k=>k.type=='down');
-  let typingSpeed=downs.length>1?(downs[downs.length-1].time-downs[0].time)/downs.length:0;
-  let typingHuman=typingSpeed>30&&typingSpeed<800&&keyEvents.length>10;
-  let typingStatus=typingHuman?'✅ Human Typing - Avg '+typingSpeed.toFixed(0)+'ms':'❌ Suspicious Typing - Bot or Copy-Paste - '+keyEvents.length+' events';
+  let isFake=isMock||!isSaudi||isVPN||dev.emu;let score=isFake?10:100;
+  let wa='*Saleem Shekh - v18 MOBILE PRO*%0A*Result:* '+(isFake?'❌ FAKE':'✅ REAL')+' '+score+'%25%0A*Name:* '+typeBox.value+'%0A*GPS:* '+lat.toFixed(5)+','+lon.toFixed(5)+'%0A*Acc:* '+acc.toFixed(1)+'m%0A*IP:* '+ip.city+' '+ip.code+'%0A*ISP:* '+ip.org+'%0A*VPN:* '+(isVPN?'YES ❌':'NO ✅')+'%0A*Fake GPS:* '+(isMock?'YES ❌':'NO ✅')+'%0A*Touch:* '+touchPoints.length+' ✅%0A*Typing:* Human ✅%0A*Risk:* '+risk+'/100';
 
-  // 5. Mouse Behavior
-  let avgMouse=mousePoints.length?mousePoints.reduce((a,b)=>a+b.speed,0)/mousePoints.length:0;
-  let mouseHuman=mousePoints.length>20&&avgMouse>0.5&&avgMouse<200;
-  let mouseStatus=mouseHuman?'✅ Human Mouse - '+mousePoints.length+' moves, avg '+avgMouse.toFixed(1)+'px':'❌ No Mouse / Bot - Only '+mousePoints.length+' moves';
-
-  // 6. Emulator Detection
-  let emuStatus=device.isEmulator?'❌ EMULATOR DETECTED - '+device.renderer+' - Headless: '+device.webdriver:'✅ Real Phone/PC - Touch: '+device.touch+' - WebDriver: '+device.webdriver;
-
-  // 7. IP Risk Score
-  let risk=calcIPRisk(ip,lat,lon);
-  let riskColor=risk.score<30?'#22c55e':risk.score<70?'#fbbf24':'#ef4444';
-  let riskLabel=risk.score<30?'LOW RISK ✅':risk.score<70?'MEDIUM RISK ⚠️':'HIGH RISK ❌';
-
-  let isFake=isMock||!isSaudi||isVPN||device.isEmulator||!typingHuman||!mouseHuman;
-  let finalScore=isFake?10:100;
-  let finalColor=isFake?'#ef4444':'#22c55e';
-
-  let waMsg='*Saleem Al Badi v17 PRO Report*%0A*Result:* '+(isFake?'❌ FAKE':'✅ REAL')+' '+finalScore+'%25%0A*VPN:* '+(isVPN?ip.code+' '+ip.city+' ❌':'NO ✅')+'%0A*Fake GPS:* '+(isMock?'YES 0.0m ❌':'NO '+acc.toFixed(1)+'m ✅')+'%0A*GPS:* '+lat.toFixed(5)+','+lon.toFixed(5)+'%0A*IP Risk:* '+risk.score+'/100 '+riskLabel+'%0A*Device:* '+(device.isEmulator?'Emulator ❌':'Real ✅')+'%0A*Typing:* '+(typingHuman?'Human ✅':'Bot ❌')+'%0A*Mouse:* '+(mouseHuman?'Human ✅':'Bot ❌')+'%0A*ISP:* '+ip.org;
-
-  out.innerHTML=
-   '<h2>1️⃣ VPN Detection</h2>'+vpnStatus+
-   '<h2>2️⃣ Fake GPS Detection</h2>'+gpsStatus+'<br>'+locationStatus+
-   '<h2>3️⃣ Device Info</h2>Platform: '+device.platform+'<br>Cores: '+device.cores+'<br>Memory: '+device.memory+'GB<br>Screen: '+device.screen+'<br>Touch: '+device.touch+'<br>Renderer: '+device.renderer+'<br>'+deviceStatus+
-   '<h2>4️⃣ Typing Biometrics</h2>'+typingStatus+'<br>Keys: '+keyEvents.length+' events'+
-   '<h2>5️⃣ Mouse Behavior</h2>'+mouseStatus+
-   '<h2>6️⃣ Emulator Detection</h2>'+emuStatus+'<br>UserAgent: '+device.userAgent.substring(0,80)+'...'+
-   '<h2>7️⃣ IP Risk Score</h2><div style=display:flex;justify-content:space-between><span>'+riskLabel+'</span><span>'+risk.score+'/100</span></div><div class=score-bar><div class=score-fill style=width:'+risk.score+'%;background:'+riskColor+'></div></div><div style=font-size:10px;margin-top:4px>'+(risk.reasons.join(', ')||'No risk factors')+'</div>'+
-   '<br><div class=badge style=background:'+finalColor+';color:#000>'+(isFake?'❌ FAKE / FRAUD DETECTED - 10%':'✅ REAL & VERIFIED - 100%')+'</div>'+
-   '<a href="https://wa.me/?text='+waMsg+'" style="display:block;width:100%;padding:12px;background:#25D366;color:#000;border-radius:8px;font-weight:900;text-decoration:none;text-align:center;margin-top:10px">📲 Share Full PRO Report on WhatsApp</a>';
-
- },{},{enableHighAccuracy:true,timeout:10000});
+  out.innerHTML='<b style=color:#00ff88>Saleem Shekh - Results:</b><br><br><b>1. VPN:</b> '+vpnTxt+'<br><b>2. Fake GPS:</b> '+gpsTxt+'<br><b>Location:</b> '+locTxt+'<br><br><b>3. Device:</b> '+devTxt+'<br><b>4. Typing:</b> '+typeTxt+'<br>Text: "'+typeBox.value+'"<br><b>5. Touch:</b> '+touchTxt+'<br><b>6. Emulator:</b> '+emuTxt+'<br><br><b>7. IP Risk:</b> '+riskTxt+'<br><br><div style=padding:12px;border-radius:10px;font-weight:900;text-align:center;background:'+(isFake?'#ef4444':'#22c55e')+';color:#000>'+(isFake?'❌ FAKE DETECTED - 10%':'✅ REAL VERIFIED - SALEEM SHEKH - 100%')+'</div><a href="https://wa.me/?text='+wa+'" style="display:block;width:100%;padding:12px;background:#25D366;color:#000;border-radius:8px;font-weight:900;text-decoration:none;text-align:center;margin-top:10px">📲 Share Report - Saleem Shekh</a>';
+ },err=>{out.innerHTML='❌ Location Error: '+err.message+'<br>Please Allow Location and try again. Turn on GPS.';},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
 </script>
 </body></html>
