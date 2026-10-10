@@ -7,43 +7,48 @@
 </head>
 <body style="background:#0f172a;color:#fff;font-family:system-ui;padding:20px;text-align:center">
 <h1>🛡️ Mini Callsign PRO</h1>
-<p style="color:#94a3b8">For Saleem Bhai | Dubai Ready</p>
+<p style="color:#94a3b8">For Saleem Bhai | Dubai Ready | v6 Fixed</p>
 <button onclick="check()" style="width:100%;padding:18px;background:#22c55e;border:none;border-radius:12px;font-weight:900;font-size:18px">📍 CHECK MY GPS + VPN NOW</button>
-<div id="out" style="margin-top:20px;background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.6">Click button to start</div>
+<div id="out" style="margin-top:20px;background:#1e293b;padding:15px;border-radius:12px;text-align:left;line-height:1.6">Click to start</div>
 <script>
 async function check(){
 let out=document.getElementById('out');
-out.innerHTML='⏳ Scanning GPS + IP...';
-let ip={city:'?',country:'?',org:'?',ip:'?',country_code:'SA'};
+out.innerHTML='⏳ Scanning...';
+let ip={city:'?',country:'?',country_code:'SA',org:'?',ip:'?'};
 try{
-// Saudi me working API
 let r=await fetch('https://ipwho.is/');
 let j=await r.json();
 if(j.success){ip={city:j.city,country:j.country,country_code:j.country_code,org:j.connection.isp,ip:j.ip};}
-}catch(e){
-try{
-let r2=await fetch('https://ipinfo.io/json');
-let j2=await r2.json();
-ip={city:j2.city,country:j2.country,org:j2.org,ip:j2.ip,country_code:j2.country};
-}catch(e2){ip={city:'Unknown',country:'SA',country_code:'SA',org:'STC/Mobily',ip:'Hidden'};}
-}
+}catch(e){}
 navigator.geolocation.getCurrentPosition(p=>{
 let lat=p.coords.latitude, lon=p.coords.longitude, acc=p.coords.accuracy;
 let org=(ip.org||'').toLowerCase();
 let vpnKeys=['m247','vpn','datacamp','digitalocean','choopa','amazon','google','cloud','ovh','hetzner'];
 let isVPN=vpnKeys.some(k=>org.includes(k));
-let isSaudi=lat>16&&lat<33&&lon>34&&lon<56;
-let ipIsSaudi=(ip.country_code==='SA' || ip.country==='Saudi Arabia');
-let mismatch=isSaudi && !ipIsSaudi;
+
+// FIX 1: Acc 0.0 = FAKE!
+let isMock = (acc===0 || acc<1 || acc>200);
+let isSaudi = lat>16 && lat<33 && lon>34 && lon<56;
+let ipIsSaudi = (ip.country_code==='SA');
+
+// FIX 2: Nigeria jaise fake ko pakadna
+let mismatch = false;
+if(isSaudi && !ipIsSaudi) mismatch=true; // Riyadh GPS but NL IP
+if(!isSaudi && ipIsSaudi) mismatch=true; // Nigeria GPS but SA IP = FAKE!
+if(acc===0) mismatch=true;
+
 let score=100;
-let msgs=[];
-if(acc>150){score-=30;msgs.push('GPS weak (indoor)');}
-else if(acc>100){score-=10;}
-if(isVPN){score-=40;msgs.push('VPN detected: '+ip.org);}
-if(mismatch){score-=35;msgs.push('IP Mismatch: '+ip.country_code+' vs SA GPS');}
+let issues=[];
+if(isMock){score-=40;issues.push('Mock/Fake GPS App (Acc 0.0m)');}
+else if(acc>100){score-=15;issues.push('Weak GPS '+acc.toFixed(1)+'m');}
+if(isVPN){score-=35;issues.push('VPN: '+ip.org);}
+if(mismatch){score-=40;issues.push('Location Mismatch: GPS '+lat.toFixed(2)+','+lon.toFixed(2)+' is not in '+ip.country_code);}
+
 let status=score>=80?'✅ REAL LOCATION':score>=50?'⚠️ SUSPICIOUS':'❌ FAKE / VPN';
-out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+'<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(acc<100?'✅ Good':'⚠️ Indoor')+'<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>ISP:</b> '+ip.org+'<br><b>IP Addr:</b> '+ip.ip+'<br><br><b>VPN:</b> '+(isVPN?'<span style=color:#ef4444>DETECTED ❌</span>':'<span style=color:#22c55e>NO VPN ✅</span>')+'<br><b>IP vs GPS:</b> '+(mismatch?'<span style=color:#ef4444>Mismatch ❌</span>':'<span style=color:#22c55e>Matched ✅</span>')+'<br><br><div style=text-align:center;background:'+(score>=80?'#22c55e':'#ef4444')+';color:#000;padding:10px;border-radius:8px;font-weight:900;font-size:20px>'+status+' - '+score+'%</div>'+(msgs.length?'<br><small>Issues: '+msgs.join(', ')+'</small>':'');
-},e=>{out.innerHTML='❌ Location Error: '+e.message+'<br>Phone Settings > Location ON karo';},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+let color=score>=80?'#22c55e':score>=50?'#f59e0b':'#ef4444';
+
+out.innerHTML='<b>GPS:</b> '+lat.toFixed(5)+','+lon.toFixed(5)+(isSaudi?' (SA)':' (Outside SA!)')+'<br><b>Acc:</b> '+acc.toFixed(1)+'m '+(isMock?'<span style=color:#ef4444>❌ FAKE APP!</span>':'<span style=color:#22c55e>✅ Good</span>')+'<br><b>IP:</b> '+ip.city+', '+ip.country+' ('+ip.country_code+')<br><b>ISP:</b> '+ip.org+'<br><br><b>VPN:</b> '+(isVPN?'<span style=color:#ef4444>DETECTED ❌</span>':'<span style=color:#22c55e>NO VPN ✅</span>')+'<br><b>IP vs GPS:</b> '+(mismatch?'<span style=color:#ef4444>Mismatch ❌</span>':'<span style=color:#22c55e>Matched ✅</span>')+'<br><br><div style=text-align:center;background:'+color+';color:#000;padding:12px;border-radius:8px;font-weight:900;font-size:20px>'+status+' - '+score+'%</div>'+(issues.length?'<br><small style=color:#fca5a5>Issues: '+issues.join('<br>')+'</small>':'');
+},{enableHighAccuracy:true,timeout:15000});
 }
 </script>
 </body>
